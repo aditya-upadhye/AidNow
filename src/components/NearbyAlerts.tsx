@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useIsFocused } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
@@ -20,18 +20,22 @@ import { Button, Card, Chip } from './ui';
 /**
  * Top of "What is happening": alerts from people in trouble nearby, for volunteers who switched alerts on. While this
  * is on screen it asks the server for new ones every 5 seconds (iPhones cannot get remote push without a paid Apple
- * Developer account). Everyone else sees how to switch it on.
+ * Developer account). Everyone else sees how to switch it on, or nothing at all with `quiet` (the Home page).
+ *
+ * Tab screens stay mounted when you leave them, so it only polls while its screen is in front, and it re-reads the
+ * resident's switches each time they come back (they may have just changed them in My role).
  */
-export function NearbyAlerts() {
+export function NearbyAlerts({ quiet = false }: { quiet?: boolean }) {
   const { t } = useTranslation();
   const { profile, online } = useApp();
+  const focused = useIsFocused();
   const [listening, setListening] = useState<boolean | null>(null);
   const [gps, setGps] = useState<Coords | null>(null);
   const lang: Lang = profile?.language ?? 'en';
 
   useEffect(() => {
-    loadCommunity().then((c) => setListening(!!c && c.consented && c.volunteer && c.receiveAlerts));
-  }, []);
+    if (focused) loadCommunity().then((c) => setListening(!!c && c.consented && c.volunteer && c.receiveAlerts));
+  }, [focused]);
 
   // Same origin rule as the rest of Community: saved address, else GPS; demo builds start in Little Haiti.
   const saved = profile?.addressCoords;
@@ -40,9 +44,9 @@ export function NearbyAlerts() {
   }, [listening, saved]);
   const origin = saved ?? (config.demoMode ? DEMO_ORIGIN : gps);
 
-  const { alerts, status, updatedAt } = useNearbyAlerts(origin, !!listening && (online || !alertsConfigured));
+  const { alerts, status, updatedAt } = useNearbyAlerts(origin, !!listening && focused && (online || !alertsConfigured));
 
-  if (listening === null) return null;
+  if (listening === null || (quiet && !listening)) return null;
 
   if (!listening) {
     return (

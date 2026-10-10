@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState, type ComponentProps } from 'r
 import { useTranslation } from 'react-i18next';
 import { Image, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { NearbyAlerts } from '../../components/NearbyAlerts';
 import { QueuedReports } from '../../components/QueuedReports';
 import { SosButton } from '../../components/SosButton';
 import { colors, font, radius, shadow, soft, tones, type Tone } from '../../components/theme';
@@ -210,6 +211,9 @@ export default function Home() {
           <Ionicons name="chevron-forward" size={20} color={colors.brand} />
         </Pressable>
       ) : null}
+
+      {/* Live alerts from people in trouble nearby, for volunteers who switched them on. Nothing for everyone else. */}
+      <NearbyAlerts quiet />
 
       {phase !== 'idle' ? (
         <Steps
