@@ -18,7 +18,7 @@ const en = {
   },
   sos: {
     label: 'SOS',
-    cta: 'Tap to call 911',
+    cta: 'Slide to call 911',
     hint: 'Opens a confirmation. Nothing is dialed yet.',
     confirmTitle: 'Call 911?',
     confirmBody: 'Only for a real emergency.',

@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Modal, PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { contactsOf } from '../core/contacts';
@@ -15,19 +15,44 @@ import { useApp } from '../state/AppContext';
 import { colors, radius } from './theme';
 
 /**
- * Top-of-Home SOS. One tap opens a full-screen confirmation with a huge "Call 911 now" button, so a
- * pocket press can't dial but a person in a panic only needs two big taps. The resident still taps
+ * Top-of-Home SOS. Sliding the handle all the way across opens a full-screen confirmation with a huge "Call 911 now" button, so a
+ * pocket press can't dial (a slide is deliberate) but a person in a panic only needs two big taps. The resident still taps
  * Call in the phone dialer: AidNow never contacts 911 itself.
  */
 export function SosButton() {
   const { t } = useTranslation();
   const { profile } = useApp();
   const [open, setOpen] = useState(false);
+  const [trackW, setTrackW] = useState(0);
+  const [x] = useState(() => new Animated.Value(0));
+  const maxX = Math.max(0, trackW - HANDLE - PAD * 2);
+  const maxRef = useRef(maxX);
+  useEffect(() => {
+    maxRef.current = maxX;
+  }, [maxX]);
 
   const show = () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     setOpen(true);
   };
+  const reset = () => Animated.spring(x, { toValue: 0, useNativeDriver: false }).start();
+
+  // maxRef is only read inside gesture callbacks, never during render.
+  // eslint-disable-next-line react-hooks/refs
+  const [pan] = useState(() =>
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, g) => x.setValue(Math.min(Math.max(0, g.dx), maxRef.current)),
+      onPanResponderRelease: (_, g) => {
+        if (maxRef.current > 0 && g.dx >= maxRef.current * 0.8) {
+          show();
+          setTimeout(reset, 400);
+        } else reset();
+      },
+      onPanResponderTerminate: reset,
+    }),
+  );
   const contacts = contactsOf(profile);
   const [telling, setTelling] = useState(false);
   // 911 comes first and is never delayed: this only opens Messages, and the call button stays above it.
@@ -51,23 +76,27 @@ export function SosButton() {
 
   return (
     <View style={s.wrap}>
-      <Pressable
+      <View
         testID="sos-button"
+        accessible
         accessibilityRole="button"
         accessibilityLabel={`${t('sos.label')}. ${t('sos.cta')}`}
         accessibilityHint={t('sos.hint')}
-        onPress={show}
-        style={({ pressed }) => [s.button, pressed && { opacity: 0.88, transform: [{ scale: 0.98 }] }]}
+        accessibilityActions={[{ name: 'activate' }]}
+        onAccessibilityAction={show}
+        onLayout={(e) => setTrackW(e.nativeEvent.layout.width)}
+        style={s.button}
       >
-        <View style={s.icon}>
-          <Ionicons name="call" size={34} color={colors.red} />
-        </View>
-        <View style={{ flex: 1 }}>
+        <Animated.View style={[s.fill, { width: Animated.add(x, HANDLE + PAD * 2), opacity: x.interpolate({ inputRange: [0, 12], outputRange: [0, 1], extrapolate: 'clamp' }) }]} />
+        <View style={s.labels} pointerEvents="none">
           <Text style={s.sos}>{t('sos.label')}</Text>
           <Text style={s.cta}>{t('sos.cta')}</Text>
         </View>
-        <Ionicons name="chevron-forward" size={28} color="#fff" />
-      </Pressable>
+        <Animated.View style={[s.icon, { transform: [{ translateX: x }] }]} {...pan.panHandlers}>
+          <Ionicons name="call" size={34} color={colors.red} />
+        </Animated.View>
+        <Ionicons name="chevron-forward" size={26} color={colors.red} style={s.chevron} pointerEvents="none" />
+      </View>
 
       <Modal visible={open} animationType="fade" onRequestClose={() => setOpen(false)} statusBarTranslucent>
         <SafeAreaView style={s.modal}>
@@ -112,12 +141,18 @@ export function SosButton() {
   );
 }
 
+const HANDLE = 64;
+const PAD = 14;
+
 const s = StyleSheet.create({
   wrap: { marginTop: 4, marginBottom: 12 },
-  button: { flexDirection: 'row', alignItems: 'center', gap: 14, minHeight: 96, paddingVertical: 14, paddingHorizontal: 16, borderRadius: radius.lg, backgroundColor: colors.red, shadowColor: colors.redDark, shadowOpacity: 0.35, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
-  icon: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
-  sos: { color: '#fff', fontSize: 34, fontWeight: '900', letterSpacing: 3 },
-  cta: { color: '#fff', fontSize: 18, fontWeight: '700' },
+  button: { flexDirection: 'row', alignItems: 'center', minHeight: 88, padding: PAD, borderRadius: radius.lg, backgroundColor: 'rgba(220, 38, 38, 0.10)', borderWidth: 1, borderColor: 'rgba(220, 38, 38, 0.28)', overflow: 'hidden', shadowColor: colors.red, shadowOpacity: 0.12, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
+  fill: { position: 'absolute', left: 0, top: 0, bottom: 0, backgroundColor: 'rgba(220, 38, 38, 0.22)' },
+  labels: { flex: 1, alignItems: 'center', paddingLeft: HANDLE },
+  icon: { position: 'absolute', left: PAD, width: HANDLE, height: HANDLE, borderRadius: HANDLE / 2, backgroundColor: 'rgba(255, 255, 255, 0.85)', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.9)', alignItems: 'center', justifyContent: 'center', shadowColor: colors.red, shadowOpacity: 0.2, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } },
+  chevron: { position: 'absolute', right: PAD },
+  sos: { color: colors.red, fontSize: 28, fontWeight: '800', letterSpacing: 3 },
+  cta: { color: colors.red, fontSize: 15, fontWeight: '600', opacity: 0.85 },
 
   modal: { flex: 1, backgroundColor: colors.red, justifyContent: 'space-between' },
   modalTop: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, gap: 12 },

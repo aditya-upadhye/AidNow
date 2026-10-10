@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ContactsManager } from '../../components/ContactsManager';
-import { colors, radius, shadow, tones, type Tone } from '../../components/theme';
+import { colors, soft, radius, shadow, tones, type Tone } from '../../components/theme';
 import { Button, Disclaimer, Screen, SectionTitle } from '../../components/ui';
 import {
   CHECKIN_STATUSES,
@@ -144,9 +144,9 @@ const s = StyleSheet.create({
   label: { fontSize: 15, fontWeight: '700', color: colors.text, marginTop: 10, marginBottom: 8 },
   pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 6 },
   pill: { paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.card },
-  pillOn: { backgroundColor: colors.navy, borderColor: colors.navy },
+  pillOn: { backgroundColor: soft.blue.bg, borderColor: soft.blue.border },
   pillText: { fontSize: 15, fontWeight: '700', color: colors.text },
-  pillTextOn: { color: '#fff' },
+  pillTextOn: { color: colors.brand },
   remove: { fontSize: 14, color: colors.red, fontWeight: '700', marginTop: 6 },
   help: { fontSize: 13, color: colors.muted, lineHeight: 18, marginVertical: 8 },
   sms: { backgroundColor: colors.card, borderRadius: radius.lg, padding: 14, borderWidth: 1, borderColor: colors.border },

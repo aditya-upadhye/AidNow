@@ -31,6 +31,13 @@ export const colors = {
   subtle: '#F1F4F8',
 };
 
+/** Translucent tints shared by buttons, banners and selected pills, so blue and red stay light and unified. */
+export const soft = {
+  blue: { bg: 'rgba(27, 75, 143, 0.12)', border: 'rgba(27, 75, 143, 0.26)', fg: colors.brand },
+  red: { bg: 'rgba(211, 47, 47, 0.10)', border: 'rgba(211, 47, 47, 0.28)', fg: colors.red },
+  amber: { bg: 'rgba(180, 83, 9, 0.10)', border: 'rgba(180, 83, 9, 0.28)', fg: colors.amber },
+};
+
 export const font = { small: 14, body: 17, large: 21, title: 28, huge: 34 };
 
 export const radius = { sm: 10, md: 14, lg: 20, pill: 999 };

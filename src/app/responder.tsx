@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, shadow } from '../components/theme';
+import { colors, soft, radius, shadow } from '../components/theme';
 import { Screen } from '../components/ui';
 import { ageFrom } from '../core/composer';
 import { contactsOf } from '../core/contacts';
@@ -34,7 +34,7 @@ export default function Responder() {
     <Screen back title={t('profile.responderCard')} bg={colors.navy}>
       <View style={s.card}>
         <View style={s.banner}>
-          <Ionicons name="id-card" size={22} color="#fff" />
+          <Ionicons name="id-card" size={22} color={colors.red} />
           <Text style={s.bannerText}>{en('responder.title')}</Text>
         </View>
         <View style={s.top}>
@@ -68,8 +68,8 @@ export default function Responder() {
 
 const s = StyleSheet.create({
   card: { backgroundColor: colors.card, borderRadius: radius.lg, overflow: 'hidden', ...shadow },
-  banner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.red, paddingHorizontal: 16, paddingVertical: 12 },
-  bannerText: { color: '#fff', fontSize: 18, fontWeight: '900', letterSpacing: 0.5, textTransform: 'uppercase' },
+  banner: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: soft.red.bg, borderBottomWidth: 1, borderBottomColor: soft.red.border, paddingHorizontal: 16, paddingVertical: 12 },
+  bannerText: { color: colors.red, fontSize: 18, fontWeight: '800', letterSpacing: 0.5, textTransform: 'uppercase' },
   top: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border },
   photo: { width: 84, height: 84, borderRadius: 42 },
   photoEmpty: { backgroundColor: colors.subtle, alignItems: 'center', justifyContent: 'center' },

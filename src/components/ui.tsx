@@ -25,7 +25,7 @@ import { AGENCIES } from '../data/directory';
 import { call } from '../services/actions';
 import { config } from '../services/config';
 import { useApp } from '../state/AppContext';
-import { colors, font, radius, shadow, tones, type Tone } from './theme';
+import { colors, font, radius, shadow, soft, tones, type Tone } from './theme';
 
 export type IconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -73,7 +73,7 @@ export function TopBar({ back, title, hide911 }: { back?: boolean | (() => void)
           onPress={() => call(AGENCIES['911'].dial)}
           style={({ pressed }) => [s.bar911, pressed && { opacity: 0.85 }]}
         >
-          <Ionicons name="call" size={18} color="#fff" />
+          <Ionicons name="call" size={18} color={colors.red} />
           <Text style={s.bar911Text}>{t('common.call911')}</Text>
         </Pressable>
       )}
@@ -181,8 +181,9 @@ export function Button({
   icon?: IconName;
   loading?: boolean;
 }) {
-  const bg = { navy: colors.navy, red: colors.red, blue: colors.blue, amber: colors.amber, outline: colors.card, plain: colors.subtle, ghost: 'transparent' }[variant];
-  const fg = { outline: colors.navy, plain: colors.text, ghost: colors.brand }[variant as 'outline'] ?? '#fff';
+  const tint = ({ navy: soft.blue, blue: soft.blue, red: soft.red, amber: soft.amber } as Record<string, typeof soft.blue>)[variant];
+  const bg = tint?.bg ?? { outline: colors.card, plain: colors.subtle, ghost: 'transparent' }[variant as 'outline'];
+  const fg = tint?.fg ?? { outline: colors.navy, plain: colors.text, ghost: colors.brand }[variant as 'outline'];
   return (
     <Pressable
       accessibilityRole="button"
@@ -194,6 +195,7 @@ export function Button({
         big && s.buttonBig,
         { backgroundColor: bg, opacity: disabled ? 0.45 : pressed ? 0.85 : 1 },
         variant === 'outline' && { borderWidth: 1.5, borderColor: colors.border },
+        tint && { borderWidth: 1, borderColor: tint.border },
         style,
       ]}
     >
@@ -350,8 +352,8 @@ const s = StyleSheet.create({
   backBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.subtle },
   barTitle: { flex: 1, fontSize: font.body, fontWeight: '700', color: colors.text },
   barTitleTab: { fontSize: font.large, fontWeight: '800', letterSpacing: -0.3 },
-  bar911: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.red, borderRadius: radius.pill, paddingVertical: 10, paddingHorizontal: 18 },
-  bar911Text: { color: '#fff', fontSize: 18, fontWeight: '900', letterSpacing: 0.5 },
+  bar911: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: soft.red.bg, borderWidth: 1, borderColor: soft.red.border, borderRadius: radius.pill, paddingVertical: 10, paddingHorizontal: 18 },
+  bar911Text: { color: colors.red, fontSize: 18, fontWeight: '800', letterSpacing: 0.5 },
   demo: { backgroundColor: '#FFE066', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 },
   demoText: { fontWeight: '900', color: '#3D3200', fontSize: 12, letterSpacing: 0.5 },
   offline: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#334155', paddingHorizontal: 16, paddingVertical: 9 },

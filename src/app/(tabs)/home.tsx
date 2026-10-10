@@ -17,8 +17,8 @@ import { Image, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'r
 
 import { QueuedReports } from '../../components/QueuedReports';
 import { SosButton } from '../../components/SosButton';
-import { colors, font, radius, shadow, tones, type Tone } from '../../components/theme';
-import { Button, Chip, Disclaimer, Pulse, Screen, SectionTitle, Steps, type StepState } from '../../components/ui';
+import { colors, font, radius, shadow, soft, tones, type Tone } from '../../components/theme';
+import { Button, Chip, Disclaimer, Screen, SectionTitle, Steps, type StepState } from '../../components/ui';
 import { buttonTriage } from '../../core/triageSchema';
 import type { Situation } from '../../core/types';
 import { config } from '../../services/config';
@@ -200,36 +200,16 @@ export default function Home() {
 
       {storm ? (
         <Pressable onPress={() => router.push('/prepare')} style={({ pressed }) => [s.storm, pressed && { opacity: 0.9 }]}>
-          <MaterialCommunityIcons name="weather-hurricane" size={28} color="#fff" />
+          <MaterialCommunityIcons name="weather-hurricane" size={28} color={colors.brand} />
           <View style={{ flex: 1 }}>
             <Text style={s.stormTitle}>
               {t(`storm.${storm.classification}`, { defaultValue: t('storm.other') })} {storm.name}
             </Text>
             <Text style={s.stormSub}>{t('home.stormSub', { kt: storm.intensityKt })}</Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color="#fff" />
+          <Ionicons name="chevron-forward" size={20} color={colors.brand} />
         </Pressable>
       ) : null}
-
-      {/* Voice */}
-      <View style={s.micWrap}>
-        <View style={s.micCircleWrap}>
-          <Pulse active={recording} color={colors.red} size={96} />
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={recording ? t('home.listening') : t('home.tapToTalk')}
-            onPress={toggleRecording}
-            disabled={busy}
-            style={({ pressed }) => [s.mic, recording && s.micActive, (busy || pressed) && { opacity: 0.8 }]}
-          >
-            <Ionicons name={recording ? 'stop' : 'mic'} size={40} color="#fff" />
-          </Pressable>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={s.micLabel}>{recording ? t('home.listening') : phase === 'transcribing' ? t('home.transcribing') : t('home.tapToTalk')}</Text>
-          {recording ? <Text style={s.timer}>{elapsed}</Text> : null}
-        </View>
-      </View>
 
       {phase !== 'idle' ? (
         <Steps
@@ -276,9 +256,30 @@ export default function Home() {
             </View>
           </View>
         ) : null}
+        {recording || phase === 'transcribing' ? (
+          <View style={s.voiceStatus}>
+            <View style={s.recDot} />
+            <Text style={s.voiceStatusText}>{recording ? `${t('home.listening')} ${elapsed}` : t('home.transcribing')}</Text>
+          </View>
+        ) : null}
         <View style={s.inputActions}>
-          <Pressable onPress={pickPhoto} style={({ pressed }) => [s.camBtn, pressed && { opacity: 0.8 }]} accessibilityLabel={t('home.addPhoto')}>
-            <Ionicons name="camera" size={24} color={colors.blue} />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={recording ? t('home.listening') : t('home.tapToTalk')}
+            onPress={toggleRecording}
+            disabled={busy}
+            style={({ pressed }) => [s.iconBtn, s.micBtn, recording && s.micActive, (busy || pressed) && { opacity: 0.8 }]}
+          >
+            <Ionicons name={recording ? 'stop' : 'mic'} size={24} color={recording ? colors.red : colors.brand} />
+          </Pressable>
+          <Pressable
+            onPress={pickPhoto}
+            disabled={busy || recording}
+            style={({ pressed }) => [s.iconBtn, s.camBtn, (busy || recording) && { opacity: 0.5 }, pressed && { opacity: 0.8 }]}
+            accessibilityRole="button"
+            accessibilityLabel={t('home.addPhoto')}
+          >
+            <Ionicons name="camera" size={24} color={colors.brand} />
           </Pressable>
           <Button
             label={phase === 'thinking' ? t('home.thinking') : t('home.getHelp')}
@@ -339,15 +340,10 @@ const s = StyleSheet.create({
   greeting: { fontSize: 15, fontWeight: '600', color: colors.muted, marginTop: 4 },
   title: { fontSize: font.title, fontWeight: '800', color: colors.text, letterSpacing: -0.5, marginBottom: 10 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 6 },
-  storm: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.navy2, borderRadius: radius.lg, padding: 14, marginTop: 8, ...shadow },
-  stormTitle: { color: '#fff', fontSize: font.body, fontWeight: '800' },
-  stormSub: { color: '#C7D4EA', fontSize: 13, marginTop: 2 },
-  micWrap: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 14, marginBottom: 4, paddingVertical: 12, paddingHorizontal: 14, borderRadius: radius.lg, backgroundColor: colors.blueBg, borderWidth: 1, borderColor: '#C9DDF5' },
-  micCircleWrap: { width: 96, height: 96, alignItems: 'center', justifyContent: 'center' },
-  mic: { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.navy, alignItems: 'center', justifyContent: 'center', ...shadow },
-  micActive: { backgroundColor: colors.red },
-  micLabel: { fontSize: font.large, fontWeight: '800', color: colors.navy },
-  timer: { fontSize: font.large, color: colors.red, fontWeight: '700', fontVariant: ['tabular-nums'], marginTop: 2 },
+  storm: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: soft.blue.bg, borderWidth: 1, borderColor: soft.blue.border, borderRadius: radius.lg, padding: 14, marginTop: 8 },
+  stormTitle: { color: colors.navy, fontSize: font.body, fontWeight: '800' },
+  stormSub: { color: colors.muted, fontSize: 13, marginTop: 2 },
+  micActive: { backgroundColor: soft.red.bg, borderColor: soft.red.border },
   notice: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', backgroundColor: colors.blueBg, borderRadius: radius.md, padding: 12, marginVertical: 6 },
   noticeText: { flex: 1, fontSize: 15, color: colors.text, lineHeight: 21 },
   inputCard: { backgroundColor: colors.card, borderRadius: radius.lg, padding: 14, marginTop: 10, ...shadow },
@@ -368,7 +364,12 @@ const s = StyleSheet.create({
   photoText: { fontSize: 14, color: colors.muted },
   photoRemove: { fontSize: 14, color: colors.red, fontWeight: '700', marginTop: 4 },
   inputActions: { flexDirection: 'row', gap: 10, alignItems: 'center', marginTop: 12 },
-  camBtn: { width: 52, height: 52, borderRadius: radius.md, borderWidth: 1.5, borderColor: colors.blue, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.blueBg },
+  iconBtn: { width: 52, height: 52, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
+  micBtn: { backgroundColor: soft.blue.bg, borderWidth: 1, borderColor: soft.blue.border },
+  camBtn: { borderWidth: 1, borderColor: soft.blue.border, backgroundColor: soft.blue.bg },
+  voiceStatus: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 },
+  recDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.red },
+  voiceStatusText: { fontSize: 15, fontWeight: '700', color: colors.red, fontVariant: ['tabular-nums'] },
   demoToggle: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 12, marginBottom: 6 },
   demoToggleText: { fontSize: 14, fontWeight: '700', color: colors.muted },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },

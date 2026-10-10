@@ -7,7 +7,7 @@ import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { CityView } from '../../components/CityView';
 import { CommunityMap, MapLegend } from '../../components/CommunityMap';
-import { colors, radius, tones } from '../../components/theme';
+import { colors, soft, radius, tones } from '../../components/theme';
 import { Button, Card, Chip, Disclaimer, Field, Screen, SectionTitle } from '../../components/ui';
 import {
   BLOOD_TYPES,
@@ -570,9 +570,9 @@ const s = StyleSheet.create({
   link: { fontSize: 14, color: colors.brand, fontWeight: '700', marginBottom: 12 },
   pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 },
   pill: { paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.card },
-  pillOn: { backgroundColor: colors.navy, borderColor: colors.navy },
+  pillOn: { backgroundColor: soft.blue.bg, borderColor: soft.blue.border },
   pillText: { fontSize: 15, fontWeight: '700', color: colors.text },
-  pillTextOn: { color: '#fff' },
+  pillTextOn: { color: colors.brand },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
   cardTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   avatar: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },

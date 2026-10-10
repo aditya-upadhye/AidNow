@@ -21,7 +21,7 @@ const es: Strings = {
   },
   sos: {
     label: 'SOS',
-    cta: 'Toque para llamar al 911',
+    cta: 'Deslice para llamar al 911',
     hint: 'Abre una confirmación. Todavía no se marca nada.',
     confirmTitle: '¿Llamar al 911?',
     confirmBody: 'Solo para una emergencia real.',

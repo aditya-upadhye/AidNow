@@ -6,7 +6,7 @@ import { Alert, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { addContact, contactProblem, removeContact, updateContact, type ContactDraft } from '../core/contacts';
 import type { Contact, Lang } from '../core/types';
-import { colors, radius, shadow } from './theme';
+import { colors, soft, radius, shadow } from './theme';
 import { ContactPicker } from './ContactPicker';
 import { Button, Card, Field } from './ui';
 
@@ -189,9 +189,9 @@ const s = StyleSheet.create({
   help: { fontSize: 13, color: colors.muted, lineHeight: 18, marginBottom: 8 },
   pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 },
   pill: { paddingVertical: 9, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.card },
-  pillOn: { backgroundColor: colors.navy, borderColor: colors.navy },
+  pillOn: { backgroundColor: soft.blue.bg, borderColor: soft.blue.border },
   pillText: { fontSize: 15, fontWeight: '700', color: colors.text },
-  pillTextOn: { color: '#fff' },
+  pillTextOn: { color: colors.brand },
   empty: { fontSize: 15, color: colors.muted, textAlign: 'center', marginVertical: 4 },
   removeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 14, paddingVertical: 4 },
   removeText: { fontSize: 15, fontWeight: '700', color: colors.red },

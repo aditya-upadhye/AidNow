@@ -9,7 +9,7 @@ import { quickCoords } from '../services/notify';
 import { areaFor, feed, submitReport, type ReportResult } from '../services/reports';
 import { useApp } from '../state/AppContext';
 import { HeatMap } from './HeatMap';
-import { colors, radius, shadow } from './theme';
+import { colors, soft, radius, shadow } from './theme';
 import { Button, Card, Chip, SectionTitle } from './ui';
 
 const WINDOWS = [6, 24, 48];
@@ -229,9 +229,9 @@ const s = StyleSheet.create({
   outcomeText: { flex: 1, fontSize: 14, fontWeight: '700', color: colors.green, lineHeight: 19 },
   pills: { flexDirection: 'row', gap: 8, paddingRight: 16 },
   pill: { paddingVertical: 8, paddingHorizontal: 13, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.card },
-  pillOn: { backgroundColor: colors.navy, borderColor: colors.navy },
+  pillOn: { backgroundColor: soft.blue.bg, borderColor: soft.blue.border },
   pillText: { fontSize: 14, fontWeight: '700', color: colors.text },
-  pillTextOn: { color: '#fff' },
+  pillTextOn: { color: colors.brand },
   tiles: { flexDirection: 'row', gap: 10, marginTop: 12 },
   tile: { flex: 1, backgroundColor: colors.card, borderRadius: radius.lg, padding: 14, ...shadow },
   tileNum: { fontSize: 30, fontWeight: '900', color: colors.red, letterSpacing: -1 },

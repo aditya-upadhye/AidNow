@@ -24,7 +24,7 @@ const ht: Strings = {
   },
   sos: {
     label: 'SOS',
-    cta: 'Tape pou rele 911',
+    cta: 'Glise pou rele 911',
     hint: 'Li louvri yon konfimasyon. Pa gen anyen ki rele ankò.',
     confirmTitle: 'Rele 911?',
     confirmBody: 'Sèlman pou yon vrè ijans.',

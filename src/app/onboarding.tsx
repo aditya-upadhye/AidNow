@@ -8,7 +8,7 @@ import { Image, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { ContactsManager } from '../components/ContactsManager';
 import { ModelRow } from '../components/ModelDownloads';
-import { colors, font, radius, shadow } from '../components/theme';
+import { colors, font, radius, soft } from '../components/theme';
 import { Button, Card, Disclaimer, Field, IconCircle, Screen, SectionTitle, type IconName } from '../components/ui';
 import type { Contact, Lang, Profile } from '../core/types';
 import i18n from '../i18n';
@@ -100,7 +100,7 @@ export default function Onboarding() {
               <Text style={s.langText}>{l.label}</Text>
               <Text style={s.langTag}>{l.tagline}</Text>
             </View>
-            <Ionicons name="arrow-forward-circle" size={34} color="#fff" />
+            <Ionicons name="arrow-forward-circle" size={34} color={colors.brand} />
           </Pressable>
         ))}
         <Disclaimer />
@@ -198,9 +198,9 @@ const s = StyleSheet.create({
   appName: { fontSize: font.huge, fontWeight: '900', color: colors.navy, marginTop: 12, letterSpacing: -0.8 },
   miami: { fontSize: 15, fontWeight: '700', color: colors.muted, marginTop: 2, letterSpacing: 1, textTransform: 'uppercase' },
   langPrompt: { fontSize: font.title, fontWeight: '800', color: colors.text, textAlign: 'center', marginBottom: 8 },
-  lang: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.navy, borderRadius: radius.lg, paddingVertical: 20, paddingHorizontal: 20, marginVertical: 7, ...shadow },
-  langText: { color: '#fff', fontSize: 24, fontWeight: '800' },
-  langTag: { color: '#C7D4EA', fontSize: 15, marginTop: 3 },
+  lang: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: soft.blue.bg, borderWidth: 1, borderColor: soft.blue.border, borderRadius: radius.lg, paddingVertical: 20, paddingHorizontal: 20, marginVertical: 7 },
+  langText: { color: colors.navy, fontSize: 24, fontWeight: '800' },
+  langTag: { color: colors.muted, fontSize: 15, marginTop: 3 },
   progress: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
   dot: { width: 28, height: 6, borderRadius: 3, backgroundColor: colors.border },
   dotOn: { backgroundColor: colors.brand },

@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Circle, Marker } from 'react-native-maps';
 
 import { heat, type AreaStat } from '../core/reports';
-import { colors, radius } from './theme';
+import { colors, soft, radius } from './theme';
 import { regionFor } from './CommunityMap';
 import { ZIP_CENTROIDS } from '../data/zipCentroids';
 
@@ -32,7 +32,7 @@ export function HeatMap({ areas, selected, onSelect, height = 320 }: { areas: Ar
             <Circle key={`c-${a.zip}`} center={at} radius={650 + Math.sqrt(a.total) * 190} fillColor={`${colors.red}${alpha}`} strokeColor={on ? colors.navy : `${colors.red}AA`} strokeWidth={on ? 3 : 1} />,
             <Marker key={`m-${a.zip}`} coordinate={at} onPress={() => onSelect(a.zip)} anchor={{ x: 0.5, y: 0.5 }} zIndex={on ? 2 : 1}>
               <View style={[s.badge, on && s.badgeOn]}>
-                <Text style={[s.badgeText, on && { color: '#fff' }]}>{a.total}</Text>
+                <Text style={[s.badgeText, on && { color: colors.brand }]}>{a.total}</Text>
               </View>
             </Marker>,
           ];
@@ -45,6 +45,6 @@ export function HeatMap({ areas, selected, onSelect, height = 320 }: { areas: Ar
 const s = StyleSheet.create({
   wrap: { borderRadius: radius.lg, overflow: 'hidden', backgroundColor: colors.subtle, borderWidth: 1, borderColor: colors.border },
   badge: { minWidth: 30, height: 30, paddingHorizontal: 6, borderRadius: 15, backgroundColor: '#fff', borderWidth: 2, borderColor: colors.red, alignItems: 'center', justifyContent: 'center' },
-  badgeOn: { backgroundColor: colors.navy, borderColor: colors.navy },
+  badgeOn: { backgroundColor: soft.blue.bg, borderColor: soft.blue.border },
   badgeText: { fontSize: 13, fontWeight: '900', color: colors.red },
 });

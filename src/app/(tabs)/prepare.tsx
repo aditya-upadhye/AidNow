@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius } from '../../components/theme';
+import { colors, soft, radius } from '../../components/theme';
 import { Button, Card, Disclaimer, IconCircle, Screen } from '../../components/ui';
 import type { Coords } from '../../core/types';
 import { LINKS } from '../../data/directory';
@@ -83,7 +83,7 @@ export default function Prepare() {
                 </Text>
                 <Text style={s.stormSub}>{st.intensityKt} kt · National Hurricane Center</Text>
               </View>
-              <Ionicons name="open-outline" size={18} color="#fff" />
+              <Ionicons name="open-outline" size={18} color={colors.brand} />
             </Pressable>
           ))
         )}
@@ -194,9 +194,9 @@ const s = StyleSheet.create({
   body: { fontSize: 16, color: colors.text, lineHeight: 23 },
   note: { fontSize: 13, color: colors.muted, lineHeight: 18, marginTop: 6 },
   saved: { fontSize: 12, color: colors.faint, marginTop: 6 },
-  storm: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.navy2, borderRadius: radius.md, padding: 12, marginVertical: 4 },
-  stormName: { color: '#fff', fontSize: 16, fontWeight: '800' },
-  stormSub: { color: '#C7D4EA', fontSize: 13, marginTop: 2 },
+  storm: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: soft.blue.bg, borderWidth: 1, borderColor: soft.blue.border, borderRadius: radius.md, padding: 12, marginVertical: 4 },
+  stormName: { color: colors.navy, fontSize: 16, fontWeight: '800' },
+  stormSub: { color: colors.muted, fontSize: 13, marginTop: 2 },
   empty: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', backgroundColor: colors.purpleBg, borderRadius: radius.md, padding: 12 },
   shelter: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', marginVertical: 5 },
   shelterName: { fontSize: 16, fontWeight: '700', color: colors.text },

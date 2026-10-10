@@ -15,7 +15,7 @@ jest.mock('expo-haptics', () => ({ notificationAsync: jest.fn(), NotificationFee
 jest.mock('react-native-safe-area-context', () => ({ SafeAreaView: ({ children }: any) => children }));
 jest.mock('@expo/vector-icons', () => ({ Ionicons: () => null }));
 
-const find = (r: any, id: string) => r.root.findAll((n: any) => n.props.testID === id && typeof n.props.onPress === 'function')[0];
+const find = (r: any, id: string) => r.root.findAll((n: any) => n.props.testID === id && (typeof n.props.onPress === 'function' || typeof n.props.onAccessibilityAction === 'function'))[0];
 
 const mount = async () => {
   let r: any;
@@ -35,14 +35,14 @@ describe('SosButton', () => {
 
   it('does not dial on the first tap, only opens the confirmation', async () => {
     const r = await mount();
-    await act(async () => find(r, 'sos-button').props.onPress());
+    await act(async () => find(r, 'sos-button').props.onAccessibilityAction({ nativeEvent: { actionName: 'activate' } }));
     expect(mockCall).not.toHaveBeenCalled();
     expect(find(r, 'sos-call')).toBeTruthy();
   });
 
   it('dials 911 when the big call button is pressed', async () => {
     const r = await mount();
-    await act(async () => find(r, 'sos-button').props.onPress());
+    await act(async () => find(r, 'sos-button').props.onAccessibilityAction({ nativeEvent: { actionName: 'activate' } }));
     await act(async () => find(r, 'sos-call').props.onPress());
     expect(mockCall).toHaveBeenCalledTimes(1);
     expect(mockCall).toHaveBeenCalledWith('911');
@@ -50,7 +50,7 @@ describe('SosButton', () => {
 
   it('cancel closes without dialing', async () => {
     const r = await mount();
-    await act(async () => find(r, 'sos-button').props.onPress());
+    await act(async () => find(r, 'sos-button').props.onAccessibilityAction({ nativeEvent: { actionName: 'activate' } }));
     await act(async () => find(r, 'sos-cancel').props.onPress());
     expect(mockCall).not.toHaveBeenCalled();
     expect(find(r, 'sos-call')).toBeUndefined();
@@ -65,7 +65,7 @@ describe('SosButton', () => {
     it('texts every saved contact with a "need help" status, and never touches 911', async () => {
       mockProfile.current = { address: '123 NW 54th St, Miami', fullName: 'Marie', contacts };
       const r = await mount();
-      await act(async () => find(r, 'sos-button').props.onPress());
+      await act(async () => find(r, 'sos-button').props.onAccessibilityAction({ nativeEvent: { actionName: 'activate' } }));
       await act(async () => find(r, 'sos-notify').props.onPress());
       expect(mockNotify).toHaveBeenCalledTimes(1);
       expect(mockNotify).toHaveBeenCalledWith(mockProfile.current, contacts, 'need_help');
@@ -74,7 +74,7 @@ describe('SosButton', () => {
 
     it('with no contacts it offers to add some, instead of a notify button', async () => {
       const r = await mount();
-      await act(async () => find(r, 'sos-button').props.onPress());
+      await act(async () => find(r, 'sos-button').props.onAccessibilityAction({ nativeEvent: { actionName: 'activate' } }));
       expect(find(r, 'sos-notify')).toBeUndefined();
       await act(async () => find(r, 'sos-add-contacts').props.onPress());
       expect(mockPush).toHaveBeenCalledWith('/family');
@@ -84,7 +84,7 @@ describe('SosButton', () => {
     it('the 911 call button is still there and still works alongside the contact button', async () => {
       mockProfile.current = { address: 'x', fullName: 'Marie', contacts };
       const r = await mount();
-      await act(async () => find(r, 'sos-button').props.onPress());
+      await act(async () => find(r, 'sos-button').props.onAccessibilityAction({ nativeEvent: { actionName: 'activate' } }));
       expect(find(r, 'sos-notify')).toBeTruthy();
       await act(async () => find(r, 'sos-call').props.onPress());
       expect(mockCall).toHaveBeenCalledWith('911');
