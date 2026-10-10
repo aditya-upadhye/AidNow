@@ -9,6 +9,12 @@ export const config = {
    * no one. Set a teammate's phone in .env for the live demo, so "send" visibly arrives somewhere.
    */
   demoRecipient: process.env.EXPO_PUBLIC_DEMO_RECIPIENT || '+13055550100',
+  /**
+   * Supabase project for neighbor alerts (see supabase/migrations). Empty = alerts stay on this phone.
+   * The anon key is meant to ship in the app: what it may do is limited by the SQL functions, not by keeping it secret.
+   */
+  supabaseUrl: (process.env.EXPO_PUBLIC_SUPABASE_URL ?? '').replace(/\/+$/, ''),
+  supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
   /** Gemma 4 usually answers in about 2 s; past this, fall back to the on-device path. */
   onlineTimeoutMs: 8000,
   /** Requests with a photo took up to ~7.6 s in testing. */

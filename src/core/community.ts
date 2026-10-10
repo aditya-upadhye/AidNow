@@ -78,6 +78,8 @@ export type CommunitySettings = {
   skills: Skill[];
   needsCheckIn: boolean;
   needFlags: NeedFlag[];
+  /** Volunteers only: show alerts from people in trouble nearby in "What is happening". */
+  receiveAlerts: boolean;
   /** The resident's own number, for people who match with them to text. Not the emergency contact's. */
   phone: string;
   /** The resident read the privacy note and agreed to be visible. Nothing is published before this. */
@@ -91,6 +93,7 @@ export const DEFAULT_SETTINGS: CommunitySettings = {
   skills: [],
   needsCheckIn: false,
   needFlags: [],
+  receiveAlerts: false,
   phone: '',
   consented: false,
 };

@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Image, Platform, Pressable, Share, StyleSheet, Text, View } from 'react-native';
 
 import { colors, font, radius, shadow, tones, type Tone } from '../components/theme';
+import { EmergencyAlertNotice, NeighborAlertCard } from '../components/NeighborAlertCard';
 import { Button, Card, Chip, Disclaimer, IconCircle, P, Screen, SectionTitle, type IconName } from '../components/ui';
 import { buildFields, compose911, composeConfirmation, composeContactMessage, composeReport, SMS_LIMIT } from '../core/composer';
 import { contactsOf, firstName } from '../core/contacts';
@@ -20,7 +21,8 @@ import { call, displayTarget, text as sendText } from '../services/actions';
 import { config } from '../services/config';
 import { getCoords } from '../services/location';
 import { quickCoords, textGroups } from '../services/notify';
-import { enqueueReport } from '../services/storage';
+import { useEmergencyAlert } from '../services/alerts';
+import { enqueueReport, loadShareEmergencies } from '../services/storage';
 import { useApp } from '../state/AppContext';
 
 const INTERPRETER: Record<Lang, string> = {
@@ -93,6 +95,21 @@ export default function Result() {
     }
     setQueued(true);
   }, [decision, online, queued, session, profile, texts, gps, summary]);
+
+  // An emergency result tells volunteers nearby on its own: nothing to tap, and never in the way of 911.
+  // Keyed on the triage so answering a question or re-rendering never sends it twice.
+  const [shareEmergencies, setShareEmergencies] = useState(false);
+  useEffect(() => {
+    loadShareEmergencies().then(setShareEmergencies);
+  }, []);
+  const alertStatus = useEmergencyAlert({
+    key: decision?.screen === 'emergency' ? (session?.triage ?? null) : null,
+    situation: decision?.screen === 'emergency' ? decision.situation : null,
+    addressCoords: profile?.addressCoords,
+    gps,
+    online,
+    enabled: shareEmergencies,
+  });
 
   if (!session || !decision) return <Redirect href="/home" />;
 
@@ -287,6 +304,8 @@ export default function Result() {
           </Pressable>
         ) : null}
 
+        <EmergencyAlertNotice status={alertStatus} />
+
         {/* The 911 text, shown the way Messages will show it */}
         <SectionTitle>{t('result.smsTitle')}</SectionTitle>
         <Card>
@@ -352,6 +371,7 @@ export default function Result() {
         <Button big variant="red" icon="call" label={t('result.call911')} onPress={() => call(AGENCIES['911'].dial)} />
         <Button variant="amber" icon="call-outline" label={t('result.callAgency', { name: agency.name })} onPress={() => call(agency.dial)} />
         <Text style={s.hint}>{agency.display}</Text>
+        <NeighborAlertCard urgency="urgent_safety" situation={decision.situation} coords={gps} />
         {photoCard()}
         {footer([t('result.urgentTitle'), t(`result.questions.${decision.question}`)].join(' '))}
       </Screen>

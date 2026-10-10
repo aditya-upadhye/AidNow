@@ -28,7 +28,7 @@ Hack for Humanity: Miami · **Track 01: Four Forces, One City** · Forces: **Wat
 - **Escalate, never block.** The red 911 button is on every screen; any doubt routes to Emergency.
 - **No automated contact with 911.** AidNow never calls or texts 911 itself, never queues an emergency message, and never talks to a dispatcher. The resident taps call or send.
 - **Vetted advice only.** Safety steps come from official sources (`src/data/cards.ts`, each with its source). Models classify and translate; they never write safety or medical advice.
-- **Privacy.** The profile, medical notes, recordings and transcripts stay on the phone. Only the text and photo of an online request go to the Gemini API.
+- **Privacy.** The profile, medical notes, recordings and transcripts stay on the phone. Only the text and photo of an online request go to the Gemini API. An Emergency result also tells volunteers within 5 km on its own, without asking at that moment: only the kind of emergency and an area about 1 km wide, never a name, address, photo or medical detail. The resident can switch this off in My role. Urgent results can send the same alert with one tap.
 - **Demo mode never contacts 911.** With `EXPO_PUBLIC_DEMO_MODE=1` (the default), every call and text, including 911, goes to `EXPO_PUBLIC_DEMO_RECIPIENT`. If that number is missing, nothing is sent. Misusing 911 is illegal in Florida.
 
 ## Open models and libraries

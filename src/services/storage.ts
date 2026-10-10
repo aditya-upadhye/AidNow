@@ -5,7 +5,7 @@ import { migrateProfile } from '../core/contacts';
 import type { Profile } from '../core/types';
 
 /** Everything stays on the phone. Nothing here is ever sent to a server. */
-const KEYS = { profile: 'aidnow.profile', queue: 'aidnow.queue', cache: 'aidnow.cache.', community: 'aidnow.community', claimed: 'aidnow.community.claimed', lastCheckIn: 'aidnow.lastCheckIn' };
+const KEYS = { profile: 'aidnow.profile', queue: 'aidnow.queue', cache: 'aidnow.cache.', community: 'aidnow.community', claimed: 'aidnow.community.claimed', lastCheckIn: 'aidnow.lastCheckIn', alerts: 'aidnow.alerts', device: 'aidnow.device', shareEmergencies: 'aidnow.shareEmergencies' };
 
 export async function loadProfile(): Promise<Profile | null> {
   const raw = await AsyncStorage.getItem(KEYS.profile);
@@ -80,4 +80,35 @@ export async function loadLastCheckIn(): Promise<LastCheckIn | null> {
 
 export async function saveLastCheckIn(c: LastCheckIn): Promise<void> {
   await AsyncStorage.setItem(KEYS.lastCheckIn, JSON.stringify(c));
+}
+
+/** A random id for this install, used only so the server can limit how often one phone posts alerts. Not linked to a name. */
+export async function loadDeviceId(): Promise<string> {
+  const existing = await AsyncStorage.getItem(KEYS.device);
+  if (existing) return existing;
+  const id = `d-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+  await AsyncStorage.setItem(KEYS.device, id);
+  return id;
+}
+
+/** Alerts posted from this phone while no server is set up. */
+export async function loadLocalAlerts<T>(): Promise<T[]> {
+  const raw = await AsyncStorage.getItem(KEYS.alerts);
+  return raw ? (JSON.parse(raw) as T[]) : [];
+}
+
+export async function saveLocalAlerts<T>(list: T[]): Promise<void> {
+  await AsyncStorage.setItem(KEYS.alerts, JSON.stringify(list));
+}
+
+/**
+ * Whether an emergency result tells volunteers nearby, with no question asked at the time. On unless the resident
+ * switched it off in My role.
+ */
+export async function loadShareEmergencies(): Promise<boolean> {
+  return (await AsyncStorage.getItem(KEYS.shareEmergencies)) !== '0';
+}
+
+export async function saveShareEmergencies(on: boolean): Promise<void> {
+  await AsyncStorage.setItem(KEYS.shareEmergencies, on ? '1' : '0');
 }

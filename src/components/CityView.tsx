@@ -9,6 +9,7 @@ import { quickCoords } from '../services/notify';
 import { areaFor, feed, submitReport, type ReportResult } from '../services/reports';
 import { useApp } from '../state/AppContext';
 import { HeatMap } from './HeatMap';
+import { NearbyAlerts } from './NearbyAlerts';
 import { colors, soft, radius, shadow } from './theme';
 import { Button, Card, Chip, SectionTitle } from './ui';
 
@@ -136,6 +137,7 @@ export function CityView() {
       </Card>
 
       <SectionTitle>{t('city.happening')}</SectionTitle>
+      <NearbyAlerts />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.pills}>
         {WINDOWS.map((h) => (
           <Pressable key={h} accessibilityRole="button" accessibilityState={{ selected: hours === h }} onPress={() => setHours(h)} style={[s.pill, hours === h && s.pillOn]}>

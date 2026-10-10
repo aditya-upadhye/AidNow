@@ -36,7 +36,7 @@ import { call, directions, text as sendText } from '../../services/actions';
 import { directory, myRecord } from '../../services/community';
 import { config } from '../../services/config';
 import { getCoords } from '../../services/location';
-import { loadClaimed, loadCommunity, saveClaimed, saveCommunity } from '../../services/storage';
+import { loadClaimed, loadCommunity, loadShareEmergencies, saveClaimed, saveCommunity, saveShareEmergencies } from '../../services/storage';
 import { useApp } from '../../state/AppContext';
 
 type Tab = 'blood' | 'neighbors' | 'city' | 'me';
@@ -397,6 +397,10 @@ function MyRoleTab({ settings, setSettings, origin }: { settings: CommunitySetti
   const { profile } = useApp();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [shareEmergencies, setShareEmergencies] = useState(true);
+  useEffect(() => {
+    loadShareEmergencies().then(setShareEmergencies);
+  }, []);
   if (!profile) return null;
 
   const bloodType = normalizeBloodType(profile.bloodType);
@@ -432,6 +436,18 @@ function MyRoleTab({ settings, setSettings, origin }: { settings: CommunitySetti
       </Card>
 
       <Card>
+        <ToggleRow
+          label={t('community.me.shareEmergency')}
+          sub={t('community.me.shareEmergencySub')}
+          value={shareEmergencies}
+          onChange={(v) => {
+            setShareEmergencies(v);
+            saveShareEmergencies(v);
+          }}
+        />
+      </Card>
+
+      <Card>
         <Field label={t('community.me.phone')} help={t('community.me.phoneHelp')} value={settings.phone} onChangeText={(v) => set({ phone: v })} keyboardType="phone-pad" />
 
         <ToggleRow label={t('community.me.donor')} sub={t('community.me.donorSub')} value={settings.donor} disabled={!bloodType} onChange={(v) => set({ donor: v })} />
@@ -456,6 +472,7 @@ function MyRoleTab({ settings, setSettings, origin }: { settings: CommunitySetti
                 <Pill key={k} label={t(`community.skills.${k}`)} on={settings.skills.includes(k)} onPress={() => set({ skills: toggle(settings.skills, k) })} />
               ))}
             </View>
+            <ToggleRow label={t('community.me.alerts')} sub={t('community.me.alertsSub')} value={settings.receiveAlerts} onChange={(v) => set({ receiveAlerts: v })} />
           </View>
         ) : null}
 
