@@ -37,22 +37,36 @@ export function SosButton() {
   };
   const reset = () => Animated.spring(x, { toValue: 0, useNativeDriver: false }).start();
 
-  // maxRef is only read inside gesture callbacks, never during render.
+  // The whole bar is the drag surface (not just the small handle), it claims a mostly-sideways drag before the
+  // page's ScrollView can take it, and a long drag or a quick flick both count. maxRef is only read inside
+  // gesture callbacks, never during render.
   // eslint-disable-next-line react-hooks/refs
   const [pan] = useState(() =>
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponderCapture: (_, g) => Math.abs(g.dx) > 4 && Math.abs(g.dx) > Math.abs(g.dy),
+      onPanResponderTerminationRequest: () => false,
       onPanResponderMove: (_, g) => x.setValue(Math.min(Math.max(0, g.dx), maxRef.current)),
       onPanResponderRelease: (_, g) => {
-        if (maxRef.current > 0 && g.dx >= maxRef.current * 0.8) {
-          show();
-          setTimeout(reset, 400);
+        const max = maxRef.current;
+        if (max > 0 && (g.dx >= max * 0.55 || (g.vx > 0.8 && g.dx > max * 0.25))) {
+          Animated.timing(x, { toValue: max, duration: 120, useNativeDriver: false }).start(() => {
+            show();
+            setTimeout(reset, 300);
+          });
+        } else if (g.dx < 6 && Math.abs(g.dy) < 6) {
+          // A plain tap: nudge the handle to show it needs sliding.
+          Animated.sequence([
+            Animated.timing(x, { toValue: Math.min(40, max), duration: 140, useNativeDriver: false }),
+            Animated.spring(x, { toValue: 0, useNativeDriver: false }),
+          ]).start();
         } else reset();
       },
       onPanResponderTerminate: reset,
     }),
   );
+
   const contacts = contactsOf(profile);
   const [telling, setTelling] = useState(false);
   // 911 comes first and is never delayed: this only opens Messages, and the call button stays above it.
@@ -86,13 +100,14 @@ export function SosButton() {
         onAccessibilityAction={show}
         onLayout={(e) => setTrackW(e.nativeEvent.layout.width)}
         style={s.button}
+        {...pan.panHandlers}
       >
         <Animated.View style={[s.fill, { width: Animated.add(x, HANDLE + PAD * 2), opacity: x.interpolate({ inputRange: [0, 12], outputRange: [0, 1], extrapolate: 'clamp' }) }]} />
         <View style={s.labels} pointerEvents="none">
           <Text style={s.sos}>{t('sos.label')}</Text>
           <Text style={s.cta}>{t('sos.cta')}</Text>
         </View>
-        <Animated.View style={[s.icon, { transform: [{ translateX: x }] }]} {...pan.panHandlers}>
+        <Animated.View style={[s.icon, { transform: [{ translateX: x }] }]} pointerEvents="none">
           <Ionicons name="call" size={34} color={colors.red} />
         </Animated.View>
         <Ionicons name="chevron-forward" size={26} color={colors.red} style={s.chevron} pointerEvents="none" />

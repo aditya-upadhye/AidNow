@@ -6,7 +6,7 @@ import i18n from '../i18n';
 import { refreshCountyData } from '../services/county';
 import { removeStaleModels } from '../services/models';
 import { useOnline } from '../services/network';
-import { loadProfile, saveProfile } from '../services/storage';
+import { clearAllData, loadProfile, saveProfile } from '../services/storage';
 
 /** The request being handled: what the resident said, and what triage returned. */
 export type Session = {
@@ -22,6 +22,7 @@ type AppState = {
   ready: boolean;
   profile: Profile | null;
   setProfile: (p: Profile) => Promise<void>;
+  logout: () => Promise<void>;
   online: boolean;
   session: Session | null;
   setSession: (s: Session | null) => void;
@@ -58,9 +59,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     await i18n.changeLanguage(p.language);
   }, []);
 
+  const logout = useCallback(async () => {
+    await clearAllData();
+    setSession(null);
+    setProfileState(null);
+    await i18n.changeLanguage('en');
+  }, []);
+
   const value = useMemo(
-    () => ({ ready, profile, setProfile, online, session, setSession }),
-    [ready, profile, setProfile, online, session],
+    () => ({ ready, profile, setProfile, logout, online, session, setSession }),
+    [ready, profile, setProfile, logout, online, session],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

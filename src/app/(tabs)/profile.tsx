@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Image, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Alert, Image, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { ModelRow } from '../../components/ModelDownloads';
 import { colors, radius } from '../../components/theme';
@@ -17,7 +17,7 @@ const LANG_LABEL: Record<Lang, string> = { ht: 'Kreyòl', es: 'Español', en: 'E
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
-  const { profile, setProfile, online } = useApp();
+  const { profile, setProfile, logout, online } = useApp();
   const [p, setP] = useState<Profile | null>(profile);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -41,6 +41,19 @@ export default function ProfileScreen() {
     setSaved(true);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
+
+  const confirmLogout = () =>
+    Alert.alert(t('profile.logoutTitle'), t('profile.logoutBody'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('profile.logoutConfirm'),
+        style: 'destructive',
+        onPress: async () => {
+          await logout();
+          router.replace('/onboarding');
+        },
+      },
+    ]);
 
   const pickPhoto = async () => {
     const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.5 });
@@ -69,6 +82,7 @@ export default function ProfileScreen() {
       </View>
 
       <ListRow icon="id-card-outline" tone="red" title={t('profile.responderCard')} subtitle={t('profile.responderSub')} onPress={() => router.push('/responder')} />
+      <ListRow icon="log-out-outline" tone="red" title={t('profile.logout')} subtitle={t('profile.logoutSub')} onPress={confirmLogout} />
 
       <SectionTitle>{t('profile.language')}</SectionTitle>
       <View style={s.segment}>
@@ -95,19 +109,13 @@ export default function ProfileScreen() {
           <Text style={s.switchLabel}>{t('profile.shareMobility')}</Text>
           <Switch value={!!p.shareMobilityIn911} onValueChange={(v) => set({ shareMobilityIn911: v })} />
         </View>
-        <View style={s.twoCol}>
-          <View style={{ flex: 1 }}>
-            <Field
-              label={t('profile.household')}
-              value={p.householdSize ? String(p.householdSize) : ''}
-              onChangeText={(v) => set({ householdSize: parseInt(v, 10) || undefined })}
-              keyboardType="number-pad"
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Field label={t('profile.pets')} value={p.pets ?? ''} onChangeText={(v) => set({ pets: v })} />
-          </View>
-        </View>
+        <Field
+          label={t('profile.household')}
+          value={p.householdSize ? String(p.householdSize) : ''}
+          onChangeText={(v) => set({ householdSize: parseInt(v, 10) || undefined })}
+          keyboardType="number-pad"
+        />
+        <Field label={t('profile.pets')} value={p.pets ?? ''} onChangeText={(v) => set({ pets: v })} />
         <View style={s.lock}>
           <Ionicons name="lock-closed-outline" size={14} color={colors.green} />
           <Text style={s.lockText}>{t('onboarding.privacy')}</Text>
@@ -142,7 +150,6 @@ const s = StyleSheet.create({
   segTextOn: { color: colors.navy },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
   switchLabel: { flex: 1, fontSize: 15, color: colors.text },
-  twoCol: { flexDirection: 'row', gap: 10 },
   lock: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   lockText: { fontSize: 13, color: colors.green, fontWeight: '600' },
   note: { fontSize: 14, color: colors.muted, lineHeight: 19, marginBottom: 4 },

@@ -7,6 +7,15 @@ import type { Profile } from '../core/types';
 /** Everything stays on the phone. Nothing here is ever sent to a server. */
 const KEYS = { profile: 'aidnow.profile', queue: 'aidnow.queue', cache: 'aidnow.cache.', community: 'aidnow.community', claimed: 'aidnow.community.claimed', lastCheckIn: 'aidnow.lastCheckIn', alerts: 'aidnow.alerts', device: 'aidnow.device', shareEmergencies: 'aidnow.shareEmergencies' };
 
+/**
+ * Log out: forget this person on this phone. Removes everything AidNow saved except the random install id, which the
+ * server uses to limit how often one phone posts alerts (so logging out can't reset that limit).
+ */
+export async function clearAllData(): Promise<void> {
+  const keys = (await AsyncStorage.getAllKeys()).filter((k) => k.startsWith('aidnow.') && k !== KEYS.device);
+  if (keys.length) await AsyncStorage.multiRemove(keys);
+}
+
 export async function loadProfile(): Promise<Profile | null> {
   const raw = await AsyncStorage.getItem(KEYS.profile);
   return raw ? migrateProfile(JSON.parse(raw)) : null;
