@@ -83,7 +83,7 @@ export default function ProfileScreen() {
       <Card>
         <Field label={t('onboarding.fullName')} value={p.fullName} onChangeText={(v) => set({ fullName: v })} />
         <Field label={t('onboarding.contactName')} value={p.contactName} onChangeText={(v) => set({ contactName: v })} />
-        <Field label={t('onboarding.contactPhone')} value={p.contactPhone} onChangeText={(v) => set({ contactPhone: v })} keyboardType="phone-pad" />
+        <Field label={t('onboarding.contactPhone')} value={p.contactPhone} onChangeText={(v) => set({ contactPhone: v.replace(/\D/g, '').slice(0, 10) })} keyboardType="phone-pad" maxLength={10} />
         <Field label={t('onboarding.address')} help={t('onboarding.addressHelp')} value={p.address} onChangeText={(v) => set({ address: v })} />
       </Card>
 

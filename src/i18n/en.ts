@@ -31,6 +31,7 @@ const en = {
     fullName: 'Your full name',
     contactName: 'Emergency contact name',
     contactPhone: 'Emergency contact phone',
+    phoneInvalid: 'Enter a 10-digit phone number.',
     address: 'Home address',
     addressHelp: 'Goes into your 911 message when there is no internet, and finds your evacuation zone.',
     skipAddress: 'Skip, use my location',

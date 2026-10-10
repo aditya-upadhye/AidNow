@@ -37,6 +37,7 @@ const ht: Strings = {
     fullName: 'Non konplè ou',
     contactName: 'Non moun pou kontakte an ka ijans',
     contactPhone: 'Telefòn moun pou kontakte an ka ijans',
+    phoneInvalid: 'Antre yon nimewo telefòn 10 chif.',
     address: 'Adrès lakay ou',
     addressHelp: 'Li ale nan mesaj 911 ou lè pa gen entènèt, epi li jwenn zòn evakyasyon ou.',
     skipAddress: 'Sote, sèvi ak kote m ye a',

@@ -50,7 +50,7 @@ export default function Onboarding() {
   const missing = {
     fullName: !form.fullName.trim(),
     contactName: !form.contactName.trim(),
-    contactPhone: form.contactPhone.replace(/\D/g, '').length < 7,
+    contactPhone: form.contactPhone.length !== 10,
     address: !skipAddress && !form.address.trim(),
   };
 
@@ -66,7 +66,7 @@ export default function Onboarding() {
       language: lang,
       fullName: form.fullName.trim(),
       contactName: form.contactName.trim(),
-      contactPhone: form.contactPhone.trim(),
+      contactPhone: form.contactPhone,
       address,
       addressCoords: address && online ? (await geocode(address)) ?? undefined : undefined,
     };
@@ -109,7 +109,8 @@ export default function Onboarding() {
 
   // ── 2. About you
   if (step === 'about') {
-    const err = (k: keyof typeof missing) => (showErrors && missing[k] ? t('common.required') : undefined);
+    const err = (k: keyof typeof missing) =>
+      showErrors && missing[k] ? t(k === 'contactPhone' && form.contactPhone ? 'onboarding.phoneInvalid' : 'common.required') : undefined;
     return (
       <Screen back={() => setStep('language')}>
         {progress}
@@ -124,9 +125,10 @@ export default function Onboarding() {
           <Field
             label={t('onboarding.contactPhone')}
             value={form.contactPhone}
-            onChangeText={(v) => setForm({ ...form, contactPhone: v })}
+            onChangeText={(v) => setForm({ ...form, contactPhone: v.replace(/\D/g, '').slice(0, 10) })}
             error={err('contactPhone')}
             keyboardType="phone-pad"
+            maxLength={10}
           />
         </Card>
         <Card>

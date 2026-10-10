@@ -34,6 +34,7 @@ const es: Strings = {
     fullName: 'Su nombre completo',
     contactName: 'Nombre del contacto de emergencia',
     contactPhone: 'Teléfono del contacto de emergencia',
+    phoneInvalid: 'Ingrese un número de teléfono de 10 dígitos.',
     address: 'Dirección de su casa',
     addressHelp: 'Va en su mensaje al 911 cuando no hay internet, y sirve para encontrar su zona de evacuación.',
     skipAddress: 'Omitir, usar mi ubicación',
