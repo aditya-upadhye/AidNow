@@ -1,6 +1,6 @@
 import { approximate } from './community';
 import { distanceKm } from './geo';
-import type { Coords, Situation, Urgency } from './types';
+import type { Coords, Lang, Situation, Urgency } from './types';
 
 /**
  * Neighbor alerts: a resident who is in trouble can tell volunteers nearby. Pure functions, so who hears about it,
@@ -21,6 +21,29 @@ export const ALERT_TTL_HOURS = 6;
 
 /** How often "What is happening" asks the server for new alerts while it is on screen. */
 export const ALERT_POLL_MS = 5000;
+
+/**
+ * What neighbors read: the kind of emergency, named for someone looking in from outside ("Flooding", not the card
+ * title "Water entering your home", which is written to the person it is happening to). `other` has no label:
+ * the screen shows its own "Someone needs help". Spanish and Creole are drafts, like the guidance cards (NATIVE REVIEW).
+ */
+export const ALERT_CATEGORY: Record<Exclude<Situation, 'other'>, Record<Lang, string>> = {
+  water_in_home: { en: 'Flooding', es: 'Inundación', ht: 'Inondasyon' },
+  injury_trapped: { en: 'Person hurt or trapped', es: 'Persona herida o atrapada', ht: 'Moun blese oswa bloke' },
+  fire_gas: { en: 'Fire or gas smell', es: 'Incendio u olor a gas', ht: 'Dife oswa odè gaz' },
+  generator_fumes: { en: 'Generator fumes', es: 'Gases de generador', ht: 'Lafimen dèlko' },
+  downed_line: { en: 'Downed power line', es: 'Cable eléctrico caído', ht: 'Kab elektrisite ki tonbe' },
+  medical_device: { en: 'Medical device without power', es: 'Equipo médico sin electricidad', ht: 'Aparèy medikal san kouran' },
+  power_outage: { en: 'Power outage', es: 'Apagón', ht: 'Blakawout' },
+  street_hazard: { en: 'Tree, debris or flooding on road', es: 'Árbol, escombros o inundación en la calle', ht: 'Pyebwa, debri oswa dlo sou wout' },
+  need_shelter: { en: 'Needs shelter', es: 'Necesita refugio', ht: 'Bezwen abri' },
+  need_supplies: { en: 'Needs food, water or medicine', es: 'Necesita comida, agua o medicinas', ht: 'Bezwen manje, dlo oswa medikaman' },
+};
+
+/** The alert's category in the reader's language, or `fallback` when the situation is `other`. */
+export function alertCategory(situation: Situation, lang: Lang, fallback: string): string {
+  return situation === 'other' ? fallback : ALERT_CATEGORY[situation][lang];
+}
 
 export function isAlertable(u: Urgency): u is AlertUrgency {
   return u === 'emergency' || u === 'urgent_safety';

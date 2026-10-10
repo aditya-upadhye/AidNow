@@ -5,17 +5,16 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { ALERT_RADIUS_KM, ALERT_TTL_HOURS, type AlertUrgency } from '../core/alerts';
+import { ALERT_RADIUS_KM, ALERT_TTL_HOURS, alertCategory, type AlertUrgency } from '../core/alerts';
 import type { Coords, Lang, Situation } from '../core/types';
-import { CARDS } from '../data/cards';
 import { alertCoords, alertsConfigured, postAlert, type EmergencyAlertStatus } from '../services/alerts';
 import { useApp } from '../state/AppContext';
 import { colors, radius } from './theme';
 import { Button, Card } from './ui';
 
-/** The situation as a short line in the resident's language, from the vetted card titles. */
+/** The situation as neighbors read it: a short category such as "Flooding", in the reader's language. */
 export function situationTitle(situation: Situation, lang: Lang, fallback: string): string {
-  return situation === 'other' ? fallback : CARDS[situation].title[lang];
+  return alertCategory(situation, lang, fallback);
 }
 
 type Outcome = 'posted' | 'limited' | 'error' | 'no_location' | null;

@@ -1,7 +1,9 @@
 import {
   ALERT_POLL_MS,
   ALERT_RADIUS_KM,
+  ALERT_CATEGORY,
   ALERT_TTL_HOURS,
+  alertCategory,
   alertsNearby,
   isAlertable,
   isExpired,
@@ -96,5 +98,22 @@ describe('minutesAgo', () => {
   test('whole minutes, and never negative when the phone clock is behind', () => {
     expect(minutesAgo('2026-10-10T11:57:30.000Z', NOW)).toBe(2);
     expect(minutesAgo('2026-10-10T12:05:00.000Z', NOW)).toBe(0);
+  });
+});
+
+describe('alertCategory', () => {
+  it('names water entering a home as flooding for neighbors, not "your home"', () => {
+    expect(alertCategory('water_in_home', 'en', '')).toBe('Flooding');
+    expect(alertCategory('water_in_home', 'es', '')).toBe('Inundación');
+  });
+
+  it('has a label in every language for every situation except other', () => {
+    for (const labels of Object.values(ALERT_CATEGORY)) {
+      for (const lang of ['en', 'es', 'ht'] as const) expect(labels[lang].length).toBeGreaterThan(0);
+    }
+  });
+
+  it('uses the fallback for other', () => {
+    expect(alertCategory('other', 'en', 'Someone needs help')).toBe('Someone needs help');
   });
 });
