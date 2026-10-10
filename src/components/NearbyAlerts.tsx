@@ -18,7 +18,8 @@ import { colors, radius, tones } from './theme';
 import { Button, Card, Chip } from './ui';
 
 /**
- * Top of "What is happening": alerts from people in trouble nearby, for volunteers who switched alerts on. While this
+ * Top of "What is happening": alerts from people in trouble nearby, for volunteers who switched alerts on. Receiving
+ * publishes nothing about the resident, so it does not need the "be visible" consent that the directory does. While this
  * is on screen it asks the server for new ones every 5 seconds (iPhones cannot get remote push without a paid Apple
  * Developer account). Everyone else sees how to switch it on, or nothing at all with `quiet` (the Home page).
  *
@@ -34,7 +35,7 @@ export function NearbyAlerts({ quiet = false }: { quiet?: boolean }) {
   const lang: Lang = profile?.language ?? 'en';
 
   useEffect(() => {
-    if (focused) loadCommunity().then((c) => setListening(!!c && c.consented && c.volunteer && c.receiveAlerts));
+    if (focused) loadCommunity().then((c) => setListening(!!c && c.volunteer && c.receiveAlerts));
   }, [focused]);
 
   // Same origin rule as the rest of Community: saved address, else GPS; demo builds start in Little Haiti.

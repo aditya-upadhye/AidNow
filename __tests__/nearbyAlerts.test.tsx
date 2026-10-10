@@ -48,8 +48,13 @@ describe('NearbyAlerts on the Home page (quiet)', () => {
     expect(r.toJSON()).toBeNull();
     mockSettings.current = { ...ON, receiveAlerts: false };
     expect((await mount(true)).toJSON()).toBeNull();
-    mockSettings.current = { ...ON, consented: false };
+    mockSettings.current = { ...ON, volunteer: false };
     expect((await mount(true)).toJSON()).toBeNull();
+  });
+
+  test('does not need the "be visible" consent: receiving alerts publishes nothing about you', async () => {
+    mockSettings.current = { ...ON, consented: false };
+    expect(text(await mount(true))).toContain('city.alerts.title');
   });
 
   test('shows the live alert to a volunteer who switched alerts on', async () => {
