@@ -1,0 +1,77 @@
+{
+  "expo": {
+    "name": "AidNow",
+    "slug": "aidnow",
+    "scheme": "aidnow",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.aidnow.miami",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "appleTeamId": "G66AZ7YLKD"
+    },
+    "android": {
+      "package": "com.aidnow.miami",
+      "adaptiveIcon": {
+        "backgroundColor": "#0B2545",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-localization",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "AidNow uses the microphone so you can describe your situation by voice. Audio stays on your phone."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "AidNow adds your location to the emergency message you send and finds the nearest evacuation centers."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "AidNow can attach a photo of the damage to your report.",
+          "cameraPermission": "AidNow can take a photo of the damage for your report."
+        }
+      ],
+      "expo-asset",
+      [
+        "llama.rn",
+        {
+          "enableEntitlements": true,
+          "entitlementsProfile": "production",
+          "forceCxx20": true,
+          "enableOpenCLAndHexagon": false
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#FFFFFF"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
