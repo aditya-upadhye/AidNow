@@ -1,8 +1,14 @@
 # AidNow
 
-**Tells Miami residents which help line to use during and after a storm, in English, Spanish or Haitian Creole, and writes the message for them, even with no internet.**
+**A multilingual emergency copilot for Miami: it listens, looks at a photo, works out what is happening, and tells residents who to call and what to say, in English, Spanish or Haitian Creole, even with no internet. Built for hurricanes and flooding, extending to earthquakes.**
 
-Hack for Humanity: Miami · **Track 01: Four Forces, One City** · Forces: **Water** (rain and king-tide flooding, water entering homes) and **Air** (hurricane recovery, failing networks and power).
+Hack for Humanity: Miami. **Eligible for three tracks:**
+
+- **Track 01: Four Forces, One City** (primary).
+- **MLH Best Open-Source AI Project**: open-weight AI is the core (Gemma 4, Gemma 3 1B and Whisper), the repo is public under the MIT license, and every model and its license is named below.
+- **Gemma** (a separate category): Gemma 4 reads text and photos online, and Gemma 3 1B runs on the phone for offline triage.
+
+Forces covered: **Water** (hurricane surge, king-tide and street flooding), **Air** (winds, power and network outages, air quality), **Land** (fallen trees, blocked streets, trapped people) and **Fire** (house fires and gas leaks).
 
 ## The problem
 
@@ -22,6 +28,15 @@ Hack for Humanity: Miami · **Track 01: Four Forces, One City** · Forces: **Wat
 3. **Triage** classifies the input. Online it uses **Gemma 4** on the Gemini API, with text and photo. Offline it uses **Gemma 3 1B on the phone** via llama.cpp (fed Whisper's English translation, since the 1B is strongest in English), then keywords, then a safety default.
 4. **Plain code decides the route** (`src/core/router.ts`). A danger-word override in three languages forces Emergency, and the model can raise urgency but never lower it.
 5. **Plain code writes the 911 text** (`src/core/composer.ts`) from a template: English, under 160 characters, abbreviations written out as the County asks, and a confirmation in the resident's language built from the same fields.
+
+## How it looks
+
+1. **Choose your language.** English, Español or Kreyòl, then a short profile: name, home address, emergency contacts, and optional medical notes. It all stays on the phone.
+2. **Home.** A soft red **Slide to call 911** bar sits on top. Below it: what is happening? Type, tap the mic to speak, or tap the camera to add a photo, then **Get help**. Six one-tap tiles cover water in the home, someone hurt, fire or gas, power out, a tree or flooding on the street, and shelter or supplies. An active storm shows as a banner.
+3. **Result.** An Emergency shows a red screen with a **Call 911** button and a ready 911 text with your address. A non-emergency gets reports for 311, FPL or 211. Each comes with a confirmation in your language, safety steps from the County guide, and a button to read it aloud.
+4. **Prepare.** Your storm surge zone, open shelters, the next high tide and the air quality, saved on the phone for when the network drops.
+5. **Family and Community.** Check in with family, find nearby blood donors and neighbor volunteers, and see live alerts by ZIP code.
+6. **Profile.** A responder card for paramedics, downloads for the offline models, and a log out button.
 
 ## Safety rules
 
@@ -69,16 +84,24 @@ npx expo run:ios --device # development build on a connected iPhone
 
 Then open **My profile → Offline models** and download Whisper (148 MB) and Gemma 3 1B (806 MB) on Wi-Fi.
 
-## Status and known limits
+## Future work
 
-- Spanish and Creole UI text, cards and danger words are drafts that use the County guide's vocabulary and **need review by fluent readers**.
-- Photos are checked only online, by Gemma 4. The resident sees what it saw in their language, with the English line underneath, because model-written Creole was poor in testing. The photo is never sent to 911; on iOS it can be shared with an agency report.
-- Whisper's accuracy in Haitian Creole is unproven, so the transcript is always editable and the big buttons are always one tap away.
-- Outside an activation, the County publishes no list of open evacuation centers, so the app says to call 311 or check miamidade.gov/emergency and never claims a center is open.
-- Voice recording is set up for iOS (16 kHz WAV). Android is not yet built or tested.
+Simple extensions, each a data or content change rather than a rewrite:
+
+- **Earthquakes.** Add earthquake situations, danger words and cited safety cards in three languages, and a USGS earthquake feed.
+- **Flooding.** Street-level flood alerts from tide and rain data, National Weather Service flood warnings, FEMA flood zones and USGS water gauges.
+- **More languages.** Add more of the languages Miami speaks, one string file each, and have fluent speakers review the Spanish and Creole text.
+- **More Miami data.** Road closures, cooling centers, a live shelter-bed and food-pantry finder, and Census language data by ZIP for the community map.
+- **City partnership.** A structured handoff with Miami-Dade 311 and Emergency Management, and the partner datasets once released.
+- **Android and other cities.** Android support, and a new city by swapping the zone file, directory and cards.
+- **Newer open models.** The triage model is set by an environment variable, so newer Gemma models drop in as they ship.
 
 ## Team
 
-Aditya Upadhye. Built with Claude Code.
+Aditya Upadhye, Kaviya Gopi (GitHub: KaviyaGopi), Prithesh Subramani. Built with Claude Code.
 
-MIT License.
+## License
+
+AidNow's code is released under the [MIT License](LICENSE). The repository is public and stays public after the event.
+
+The open models it uses keep their own licenses, linked in the table above: [Gemma 4](https://ai.google.dev/gemma/docs/gemma_4_license) (Apache 2.0), [Gemma 3](https://ai.google.dev/gemma/terms) (Gemma Terms of Use) and [Whisper](https://huggingface.co/openai/whisper-base) (Apache 2.0). Model weights are downloaded on the phone and are not part of this repository.
