@@ -1,0 +1,31 @@
+{
+  "_about": "Keyword override: any match forces the Emergency screen, whatever the model says. Source: aidnow-prep/05-danger-words.md. Spanish needs native review; Creole REQUIRES native review. Matching is whole-word, case- and accent-insensitive. Over-triggering is allowed; never remove a term to fix a false alarm without a fluent reader.",
+  "en": [
+    "not breathing", "can't breathe", "cant breathe", "cannot breathe", "stopped breathing", "hard to breathe", "choking",
+    "unconscious", "unresponsive", "passed out", "not waking up", "no pulse",
+    "bleeding badly", "won't stop bleeding", "heavy bleeding", "deep cut", "broken bone", "head injury",
+    "chest pain", "heart attack", "stroke", "seizure",
+    "baby not breathing", "child not breathing", "baby is blue",
+    "trapped", "stuck inside", "can't get out", "cant get out", "drowning", "water is rising", "water rising", "water coming in", "water entering the house",
+    "fire", "on fire", "smoke", "burning", "explosion", "gas leak", "smell gas", "smells like gas", "sparking", "sparks", "electrocuted", "shocked", "carbon monoxide", "co alarm",
+    "gun", "shot", "shooting", "stabbed", "attacked", "someone breaking in", "break-in"
+  ],
+  "es": [
+    "no respira", "no puedo respirar", "no puede respirar", "dejó de respirar", "atragantado", "se atraganta", "inconsciente", "desmayó", "desmayado", "no despierta", "sin pulso",
+    "sangrando mucho", "no para de sangrar", "hemorragia", "herida profunda", "hueso roto", "golpe en la cabeza",
+    "dolor de pecho", "infarto", "ataque al corazón", "derrame cerebral", "convulsión", "convulsiones",
+    "bebé no respira", "niño no respira", "bebé está morado",
+    "atrapado", "atrapada", "no puedo salir", "ahogando", "ahogándose", "el agua está subiendo", "el agua sube", "entra agua", "entrando agua", "se mete el agua",
+    "fuego", "incendio", "humo", "se quema", "explosión", "escape de gas", "huelo a gas", "huele a gas", "chispas", "electrocutado", "descarga eléctrica", "monóxido de carbono",
+    "pistola", "disparo", "balacera", "apuñalado", "me atacaron", "están entrando a mi casa"
+  ],
+  "ht": [
+    "pa respire", "li pa respire", "mwen pa ka respire", "mwen pa kapab respire", "pa kapab respire", "toufe", "pèdi konesans",
+    "san", "ap senyen", "senyen anpil",
+    "doulè nan pwatrin", "atak kè", "kriz",
+    "bebe a pa respire", "timoun nan pa respire",
+    "kwense", "bloke", "pa ka soti", "nwaye", "dlo ap monte", "dlo ap antre",
+    "ensandi", "dife", "lafimen", "ap boule", "eksplozyon", "gaz ap fuite", "gaz ki ap fuite", "santi gaz", "odè gaz", "etensèl", "kouran frape li", "monoksid kabòn",
+    "zam", "pistolè", "tire", "kou kouto", "piyaj"
+  ]
+}
