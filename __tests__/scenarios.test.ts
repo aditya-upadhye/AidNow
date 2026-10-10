@@ -2,10 +2,10 @@
  * The triage test scenarios from aidnow-prep/04-triage-test-scenarios.md, run through the
  * offline keyword path and the code router. Over-escalation passes; under-escalation fails.
  */
-import { buildFields, compose911, composeConfirmation, expandAddress, isUsableLocation, SMS_LIMIT } from '../src/core/composer';
+import { buildFields, compose911, composeConfirmation, composeContactMessage, expandAddress, isUsableLocation, SMS_LIMIT } from '../src/core/composer';
 import { classifyByKeywords } from '../src/core/keywordClassifier';
 import { route, type Answers, type Decision } from '../src/core/router';
-import { parseTriage } from '../src/core/triageSchema';
+import { buttonTriage, parseTriage } from '../src/core/triageSchema';
 import { URGENCY_RANK, type Lang, type Profile, type Situation, type Urgency } from '../src/core/types';
 
 type Case = {
@@ -126,8 +126,7 @@ describe('911 composer', () => {
   const marie: Profile = {
     language: 'ht',
     fullName: 'Marie Joseph',
-    contactName: 'Jean',
-    contactPhone: '+13055550100',
+    contacts: [{ id: 'c1', name: 'Jean', phone: '+13055550100', language: 'ht' }],
     address: '123 NW 54th St, Miami',
     householdSize: 2,
   };
@@ -214,5 +213,25 @@ describe('911 composer', () => {
     const t = classifyByKeywords(['water coming in'], 'en');
     const f = buildFields(t, 'water_in_home', { ...marie, dateOfBirth: '1958-01-01', householdSize: 1 }, [], null);
     expect(compose911(f)).toContain('elderly');
+  });
+});
+
+describe('contact text with the resident\'s current location', () => {
+  const here = { lat: 25.83271, lon: -80.19468 };
+  const profile = { language: 'ht', fullName: 'Marie', address: '123 NW 54 St', contacts: [] } as unknown as Profile;
+  const f = buildFields(buttonTriage(['water_in_home'], 'ht'), 'water_in_home', profile, [], null);
+
+  test('ends with a map link to where the resident is now, and still names the saved address', () => {
+    const m = composeContactMessage(f, 'en', 'Marie', true, here);
+    expect(m.endsWith('https://maps.google.com/?q=25.83271,-80.19468')).toBe(true);
+    expect(m).toContain('Northwest 54 Street');
+    expect(m).toContain('call 911');
+  });
+  test('without a fix the text is unchanged from before', () => {
+    expect(composeContactMessage(f, 'en', 'Marie', true)).not.toContain('http');
+    expect(composeContactMessage(f, 'en', 'Marie', true, null)).not.toContain('http');
+  });
+  test('works in every language', () => {
+    for (const l of ['en', 'es', 'ht'] as Lang[]) expect(composeContactMessage(f, l, 'Marie', true, here)).toContain('maps.google.com');
   });
 });

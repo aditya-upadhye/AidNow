@@ -1,13 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import type { CommunitySettings } from '../core/community';
+import { migrateProfile } from '../core/contacts';
 import type { Profile } from '../core/types';
 
 /** Everything stays on the phone. Nothing here is ever sent to a server. */
-const KEYS = { profile: 'aidnow.profile', queue: 'aidnow.queue', cache: 'aidnow.cache.' };
+const KEYS = { profile: 'aidnow.profile', queue: 'aidnow.queue', cache: 'aidnow.cache.', community: 'aidnow.community', claimed: 'aidnow.community.claimed', lastCheckIn: 'aidnow.lastCheckIn' };
 
 export async function loadProfile(): Promise<Profile | null> {
   const raw = await AsyncStorage.getItem(KEYS.profile);
-  return raw ? (JSON.parse(raw) as Profile) : null;
+  return raw ? migrateProfile(JSON.parse(raw)) : null;
 }
 
 export async function saveProfile(p: Profile): Promise<void> {
@@ -47,4 +49,35 @@ export async function readCache<T>(key: string): Promise<Cached<T> | null> {
 
 export async function writeCache<T>(key: string, data: T): Promise<void> {
   await AsyncStorage.setItem(KEYS.cache + key, JSON.stringify({ savedAt: new Date().toISOString(), data }));
+}
+
+export async function loadCommunity(): Promise<CommunitySettings | null> {
+  const raw = await AsyncStorage.getItem(KEYS.community);
+  return raw ? (JSON.parse(raw) as CommunitySettings) : null;
+}
+
+export async function saveCommunity(c: CommunitySettings): Promise<void> {
+  await AsyncStorage.setItem(KEYS.community, JSON.stringify(c));
+}
+
+/** Neighbors this volunteer said they would check on: member id -> ISO time. Stays on the phone. */
+export async function loadClaimed(): Promise<Record<string, string>> {
+  const raw = await AsyncStorage.getItem(KEYS.claimed);
+  return raw ? (JSON.parse(raw) as Record<string, string>) : {};
+}
+
+export async function saveClaimed(c: Record<string, string>): Promise<void> {
+  await AsyncStorage.setItem(KEYS.claimed, JSON.stringify(c));
+}
+
+export type LastCheckIn = { at: string; status: string; count: number };
+
+/** When and what the resident last told family. Stays on the phone. */
+export async function loadLastCheckIn(): Promise<LastCheckIn | null> {
+  const raw = await AsyncStorage.getItem(KEYS.lastCheckIn);
+  return raw ? (JSON.parse(raw) as LastCheckIn) : null;
+}
+
+export async function saveLastCheckIn(c: LastCheckIn): Promise<void> {
+  await AsyncStorage.setItem(KEYS.lastCheckIn, JSON.stringify(c));
 }

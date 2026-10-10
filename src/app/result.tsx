@@ -11,6 +11,7 @@ import { Image, Platform, Pressable, Share, StyleSheet, Text, View } from 'react
 import { colors, font, radius, shadow, tones, type Tone } from '../components/theme';
 import { Button, Card, Chip, Disclaimer, IconCircle, P, Screen, SectionTitle, type IconName } from '../components/ui';
 import { buildFields, compose911, composeConfirmation, composeContactMessage, composeReport, SMS_LIMIT } from '../core/composer';
+import { contactsOf, firstName } from '../core/contacts';
 import { route, type Question } from '../core/router';
 import type { Coords, Lang, Situation, Triage } from '../core/types';
 import { CARDS } from '../data/cards';
@@ -18,6 +19,7 @@ import { AGENCIES, type AgencyId } from '../data/directory';
 import { call, displayTarget, text as sendText } from '../services/actions';
 import { config } from '../services/config';
 import { getCoords } from '../services/location';
+import { quickCoords, textGroups } from '../services/notify';
 import { enqueueReport } from '../services/storage';
 import { useApp } from '../state/AppContext';
 
@@ -60,6 +62,7 @@ export default function Result() {
   const [canSpeak, setCanSpeak] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const lang: Lang = profile?.language ?? 'en';
+  const contacts = contactsOf(profile);
 
   useEffect(() => {
     if (!profile?.address) getCoords().then(setGps);
@@ -261,17 +264,28 @@ export default function Result() {
         <Button big variant="red" icon="call" label={t('result.call911')} onPress={() => call(AGENCIES['911'].dial)} style={{ marginTop: 4 }} />
         <View style={s.rowGap}>
           <Button variant="outline" icon="chatbubble-ellipses-outline" label={t('result.text911')} onPress={() => sendText(AGENCIES['911'].dial, msg)} style={{ flex: 1 }} />
-          {profile?.contactPhone ? (
+          {contacts.length > 0 ? (
             <Button
               variant="outline"
               icon="people-outline"
-              label={t('result.notifyContact', { name: profile.contactName.split(' ')[0] })}
-              onPress={() => sendText(profile.contactPhone, composeContactMessage(f, lang, profile.fullName, true))}
+              label={contacts.length === 1 ? t('result.notifyContact', { name: firstName(contacts[0].name) }) : t('result.notifyMany', { count: contacts.length })}
+              onPress={async () => {
+                // Where they are now, not just the saved address: it can differ in an evacuation.
+                const here = gps ?? (await quickCoords());
+                await textGroups(contacts, (l) => composeContactMessage(f, l, profile?.fullName ?? '', true, here));
+              }}
               style={{ flex: 1 }}
             />
-          ) : null}
+          ) : (
+            <Button variant="outline" icon="person-add-outline" label={t('contacts.addFirst')} onPress={() => router.push('/family')} style={{ flex: 1 }} />
+          )}
         </View>
         <Text style={s.hint}>{t('result.textOnlyIf')}</Text>
+        {contacts.length > 0 ? (
+          <Pressable onPress={() => router.push('/family')} hitSlop={8}>
+            <Text style={s.manage}>{t('result.manageContacts')}</Text>
+          </Pressable>
+        ) : null}
 
         {/* The 911 text, shown the way Messages will show it */}
         <SectionTitle>{t('result.smsTitle')}</SectionTitle>
@@ -415,6 +429,7 @@ const s = StyleSheet.create({
   rowGap: { flexDirection: 'row', gap: 10 },
   qHead: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', marginBottom: 8 },
   question: { flex: 1, fontSize: 19, fontWeight: '800', color: colors.text, lineHeight: 25 },
+  manage: { fontSize: 14, fontWeight: '700', color: colors.brand, textAlign: 'center', paddingVertical: 6 },
   hint: { fontSize: 13, color: colors.muted, textAlign: 'center', marginTop: 2, marginBottom: 4 },
   cardNote: { fontSize: 13, color: colors.muted, lineHeight: 18, marginTop: 6 },
   cardHead: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },

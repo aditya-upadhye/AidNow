@@ -34,7 +34,7 @@ const LOGO = require('../../assets/logo.png');
 /**
  * Top bar on every screen: back or logo on the left, the red 911 button on the right. Escalate, never block.
  */
-export function TopBar({ back, title }: { back?: boolean | (() => void); title?: string }) {
+export function TopBar({ back, title, hide911 }: { back?: boolean | (() => void); title?: string; /** Home already has the big SOS button at the top. */ hide911?: boolean }) {
   const { t } = useTranslation();
   return (
     <View style={s.bar}>
@@ -48,14 +48,14 @@ export function TopBar({ back, title }: { back?: boolean | (() => void); title?:
         >
           <Ionicons name="chevron-back" size={26} color={colors.navy} />
         </Pressable>
-      ) : (
+      ) : title ? null : (
         <View style={s.brand}>
           <Image source={LOGO} style={s.logo} />
           <Text style={s.brandText}>AidNow</Text>
         </View>
       )}
       {title ? (
-        <Text style={s.barTitle} numberOfLines={1}>
+        <Text style={[s.barTitle, !back && s.barTitleTab]} numberOfLines={1} accessibilityRole="header">
           {title}
         </Text>
       ) : (
@@ -66,15 +66,17 @@ export function TopBar({ back, title }: { back?: boolean | (() => void); title?:
           <Text style={s.demoText}>{t('common.demo')}</Text>
         </View>
       )}
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={t('result.call911')}
-        onPress={() => call(AGENCIES['911'].dial)}
-        style={({ pressed }) => [s.bar911, pressed && { opacity: 0.85 }]}
-      >
-        <Ionicons name="call" size={18} color="#fff" />
-        <Text style={s.bar911Text}>{t('common.call911')}</Text>
-      </Pressable>
+      {hide911 ? null : (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('result.call911')}
+          onPress={() => call(AGENCIES['911'].dial)}
+          style={({ pressed }) => [s.bar911, pressed && { opacity: 0.85 }]}
+        >
+          <Ionicons name="call" size={18} color="#fff" />
+          <Text style={s.bar911Text}>{t('common.call911')}</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -125,6 +127,7 @@ export function Screen({
   back,
   title,
   hero,
+  hide911,
 }: {
   children: ReactNode;
   scroll?: boolean;
@@ -133,10 +136,11 @@ export function Screen({
   title?: string;
   /** Full-width block rendered above the padded content (result banners). */
   hero?: ReactNode;
+  hide911?: boolean;
 }) {
   return (
     <SafeAreaView style={[s.safe, { backgroundColor: colors.card }]} edges={['top', 'left', 'right']}>
-      <TopBar back={back} title={title} />
+      <TopBar back={back} title={title} hide911={hide911} />
       <OfflineBanner />
       <KeyboardAvoidingView style={{ flex: 1, backgroundColor: bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {scroll ? (
@@ -345,6 +349,7 @@ const s = StyleSheet.create({
   brandText: { fontSize: 20, fontWeight: '800', color: colors.navy, letterSpacing: -0.3 },
   backBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.subtle },
   barTitle: { flex: 1, fontSize: font.body, fontWeight: '700', color: colors.text },
+  barTitleTab: { fontSize: font.large, fontWeight: '800', letterSpacing: -0.3 },
   bar911: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.red, borderRadius: radius.pill, paddingVertical: 10, paddingHorizontal: 18 },
   bar911Text: { color: '#fff', fontSize: 18, fontWeight: '900', letterSpacing: 0.5 },
   demo: { backgroundColor: '#FFE066', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 },

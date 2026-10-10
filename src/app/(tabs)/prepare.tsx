@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius } from '../components/theme';
-import { Button, Card, Disclaimer, IconCircle, Screen } from '../components/ui';
-import type { Coords } from '../core/types';
-import { LINKS } from '../data/directory';
-import { cachedAdvisories, cachedAirQuality, nearestShelters, nextHighTide, zoneFor, type AirQuality, type Shelter, type Storm, type Tide } from '../services/county';
-import { getCoords } from '../services/location';
-import { useApp } from '../state/AppContext';
+import { colors, radius } from '../../components/theme';
+import { Button, Card, Disclaimer, IconCircle, Screen } from '../../components/ui';
+import type { Coords } from '../../core/types';
+import { LINKS } from '../../data/directory';
+import { cachedAdvisories, cachedAirQuality, nearestShelters, nextHighTide, zoneFor, type AirQuality, type Shelter, type Storm, type Tide } from '../../services/county';
+import { getCoords } from '../../services/location';
+import { useApp } from '../../state/AppContext';
 
 type Loaded<T> = { data: T; savedAt: string } | null;
 
@@ -46,7 +46,7 @@ export default function Prepare() {
   const inZone = zone && zone !== 'N';
 
   return (
-    <Screen back title={t('prepare.title')}>
+    <Screen title={t('prepare.title')}>
       {/* Zone */}
       <Card>
         <View style={s.zoneRow}>

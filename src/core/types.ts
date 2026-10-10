@@ -55,11 +55,14 @@ export type Triage = {
   source: 'gemma_online' | 'gemma_device' | 'keywords' | 'button' | 'fallback';
 };
 
+/** Someone who should hear from the resident in an emergency or after a storm, and the language to write to them in. */
+export type Contact = { id: string; name: string; phone: string; language: Lang };
+
 export type Profile = {
   language: Lang;
   fullName: string;
-  contactName: string;
-  contactPhone: string;
+  /** Emergency contacts, as many as the resident adds. The first is shown first. */
+  contacts: Contact[];
   /** Empty when the resident chose "Skip, use my location". */
   address: string;
   /** Coordinates of the saved address, geocoded when online. */

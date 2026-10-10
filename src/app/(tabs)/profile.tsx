@@ -6,12 +6,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
-import { ModelRow } from '../components/ModelDownloads';
-import { colors, radius } from '../components/theme';
-import { Button, Card, Disclaimer, Field, ListRow, Screen, SectionTitle } from '../components/ui';
-import type { Lang, Profile } from '../core/types';
-import { geocode } from '../services/location';
-import { useApp } from '../state/AppContext';
+import { ModelRow } from '../../components/ModelDownloads';
+import { colors, radius } from '../../components/theme';
+import { Button, Card, Disclaimer, Field, ListRow, Screen, SectionTitle } from '../../components/ui';
+import type { Lang, Profile } from '../../core/types';
+import { geocode } from '../../services/location';
+import { useApp } from '../../state/AppContext';
 
 const LANG_LABEL: Record<Lang, string> = { ht: 'Kreyòl', es: 'Español', en: 'English' };
 
@@ -48,7 +48,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <Screen back title={t('profile.title')}>
+    <Screen title={t('profile.title')}>
       <View style={s.header}>
         <Pressable onPress={pickPhoto} style={s.avatarWrap}>
           {p.photoUri ? (
@@ -64,7 +64,7 @@ export default function ProfileScreen() {
         </Pressable>
         <View style={{ flex: 1 }}>
           <Text style={s.name}>{p.fullName || '—'}</Text>
-          <Text style={s.sub}>{p.address || t('onboarding.skipped')}</Text>
+          <Text style={s.sub}>{p.address || t('profile.noAddress')}</Text>
         </View>
       </View>
 
@@ -82,8 +82,6 @@ export default function ProfileScreen() {
       <SectionTitle>{t('onboarding.aboutYou')}</SectionTitle>
       <Card>
         <Field label={t('onboarding.fullName')} value={p.fullName} onChangeText={(v) => set({ fullName: v })} />
-        <Field label={t('onboarding.contactName')} value={p.contactName} onChangeText={(v) => set({ contactName: v })} />
-        <Field label={t('onboarding.contactPhone')} value={p.contactPhone} onChangeText={(v) => set({ contactPhone: v.replace(/\D/g, '').slice(0, 10) })} keyboardType="phone-pad" maxLength={10} />
         <Field label={t('onboarding.address')} help={t('onboarding.addressHelp')} value={p.address} onChangeText={(v) => set({ address: v })} />
       </Card>
 

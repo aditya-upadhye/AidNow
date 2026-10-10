@@ -1,3 +1,4 @@
+import { mapLink } from './checkin';
 import { stripNegated } from './negations';
 import { hasPhrase, normalize } from './normalize';
 import {
@@ -168,9 +169,13 @@ const CONTACT: Record<Lang, (name: string, what: string, where: string, called91
   ht: (name, what, where, e) => `${name} itilize AidNow: ${what}. Kote: ${where}.${e ? ' Yo di l rele 911.' : ''}`,
 };
 
-/** Text to the emergency contact, in the resident's language. */
-export function composeContactMessage(f: MessageFields, lang: Lang, fullName: string, emergency: boolean): string {
-  return CONTACT[lang](fullName || 'AidNow', f.phrase[lang], f.location ?? LOCATION_UNKNOWN[lang], emergency);
+/**
+ * Text to the emergency contacts, in the contact's language. With a GPS fix it ends with a map link to where the
+ * resident is now, which can differ from the saved address (an evacuation, a neighbor's house).
+ */
+export function composeContactMessage(f: MessageFields, lang: Lang, fullName: string, emergency: boolean, here?: Coords | null): string {
+  const base = CONTACT[lang](fullName || 'AidNow', f.phrase[lang], f.location ?? LOCATION_UNKNOWN[lang], emergency);
+  return here ? `${base} ${mapLink(here)}` : base;
 }
 
 const REPORT_INTRO: Record<Lang, string> = { en: 'Report', es: 'Reporte', ht: 'Rapò' };

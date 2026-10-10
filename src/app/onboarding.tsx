@@ -6,10 +6,11 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
+import { ContactsManager } from '../components/ContactsManager';
 import { ModelRow } from '../components/ModelDownloads';
 import { colors, font, radius, shadow } from '../components/theme';
-import { Button, Card, Disclaimer, Field, IconCircle, Screen, type IconName } from '../components/ui';
-import type { Lang, Profile } from '../core/types';
+import { Button, Card, Disclaimer, Field, IconCircle, Screen, SectionTitle, type IconName } from '../components/ui';
+import type { Contact, Lang, Profile } from '../core/types';
 import i18n from '../i18n';
 import { geocode } from '../services/location';
 import { useApp } from '../state/AppContext';
@@ -29,7 +30,8 @@ export default function Onboarding() {
   const { setProfile, online } = useApp();
   const [step, setStep] = useState<Step>('language');
   const [lang, setLang] = useState<Lang>('en');
-  const [form, setForm] = useState({ fullName: '', contactName: '', contactPhone: '', address: '' });
+  const [form, setForm] = useState({ fullName: '', address: '' });
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [skipAddress, setSkipAddress] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -49,8 +51,7 @@ export default function Onboarding() {
 
   const missing = {
     fullName: !form.fullName.trim(),
-    contactName: !form.contactName.trim(),
-    contactPhone: form.contactPhone.length !== 10,
+    contacts: contacts.length === 0,
     address: !skipAddress && !form.address.trim(),
   };
 
@@ -65,8 +66,7 @@ export default function Onboarding() {
     const profile: Profile = {
       language: lang,
       fullName: form.fullName.trim(),
-      contactName: form.contactName.trim(),
-      contactPhone: form.contactPhone,
+      contacts,
       address,
       addressCoords: address && online ? (await geocode(address)) ?? undefined : undefined,
     };
@@ -109,8 +109,7 @@ export default function Onboarding() {
 
   // ── 2. About you
   if (step === 'about') {
-    const err = (k: keyof typeof missing) =>
-      showErrors && missing[k] ? t(k === 'contactPhone' && form.contactPhone ? 'onboarding.phoneInvalid' : 'common.required') : undefined;
+    const err = (k: keyof typeof missing) => (showErrors && missing[k] ? t('common.required') : undefined);
     return (
       <Screen back={() => setStep('language')}>
         {progress}
@@ -121,16 +120,11 @@ export default function Onboarding() {
         </View>
         <Card>
           <Field label={t('onboarding.fullName')} value={form.fullName} onChangeText={(v) => setForm({ ...form, fullName: v })} error={err('fullName')} autoComplete="name" />
-          <Field label={t('onboarding.contactName')} value={form.contactName} onChangeText={(v) => setForm({ ...form, contactName: v })} error={err('contactName')} />
-          <Field
-            label={t('onboarding.contactPhone')}
-            value={form.contactPhone}
-            onChangeText={(v) => setForm({ ...form, contactPhone: v.replace(/\D/g, '').slice(0, 10) })}
-            error={err('contactPhone')}
-            keyboardType="phone-pad"
-            maxLength={10}
-          />
         </Card>
+        <SectionTitle>{t('contacts.title')}</SectionTitle>
+        <Text style={s.contactsHelp}>{t('contacts.intro')}</Text>
+        <ContactsManager contacts={contacts} defaultLanguage={lang} onChange={setContacts} />
+        {showErrors && missing.contacts ? <Text style={s.contactsError}>{t('contacts.needOne')}</Text> : null}
         <Card>
           {!skipAddress ? (
             <Field
@@ -196,6 +190,8 @@ export default function Onboarding() {
 }
 
 const s = StyleSheet.create({
+  contactsHelp: { fontSize: 15, color: colors.muted, lineHeight: 21, marginBottom: 10 },
+  contactsError: { fontSize: 14, fontWeight: '700', color: colors.red, marginBottom: 10 },
   welcome: { alignItems: 'center', marginTop: 16, marginBottom: 22 },
   bigLogo: { width: 96, height: 96, borderRadius: 24 },
   appName: { fontSize: font.huge, fontWeight: '900', color: colors.navy, marginTop: 12, letterSpacing: -0.8 },

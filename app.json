@@ -29,6 +29,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "./plugins/withSceneLifecycle",
       "expo-router",
       "expo-localization",
       [
@@ -51,6 +52,12 @@
         }
       ],
       "expo-asset",
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "AidNow reads your contacts only while you choose who to add as an emergency contact. The people you pick stay on your phone."
+        }
+      ],
       [
         "llama.rn",
         {

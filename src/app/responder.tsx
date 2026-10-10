@@ -5,6 +5,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { colors, radius, shadow } from '../components/theme';
 import { Screen } from '../components/ui';
 import { ageFrom } from '../core/composer';
+import { contactsOf } from '../core/contacts';
 import { useApp } from '../state/AppContext';
 
 /**
@@ -57,7 +58,7 @@ export default function Responder() {
         <View style={s.body}>
           {row('medical', profile.medicalNotes, true)}
           {row('mobility', profile.mobilityNeeds)}
-          {row('contact', `${profile.contactName} · ${profile.contactPhone}`)}
+          {row('contact', contactsOf(profile).map((c) => `${c.name} · ${c.phone}`).join('\n'))}
           {profile.address ? row('address', profile.address) : null}
         </View>
       </View>

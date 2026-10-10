@@ -15,17 +15,18 @@ import { useCallback, useEffect, useRef, useState, type ComponentProps } from 'r
 import { useTranslation } from 'react-i18next';
 import { Image, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { QueuedReports } from '../components/QueuedReports';
-import { colors, font, radius, shadow, tones, type Tone } from '../components/theme';
-import { Button, Chip, Disclaimer, ListRow, Pulse, Screen, SectionTitle, Steps, type StepState } from '../components/ui';
-import { buttonTriage } from '../core/triageSchema';
-import type { Situation } from '../core/types';
-import { config } from '../services/config';
-import { cachedAdvisories, zoneFor, type Storm } from '../services/county';
-import { gemmaDeviceReady } from '../services/gemmaDevice';
-import { runTriage } from '../services/triage';
-import { transcribe, warmUpWhisper, whisperReady } from '../services/whisper';
-import { useApp } from '../state/AppContext';
+import { QueuedReports } from '../../components/QueuedReports';
+import { SosButton } from '../../components/SosButton';
+import { colors, font, radius, shadow, tones, type Tone } from '../../components/theme';
+import { Button, Chip, Disclaimer, Pulse, Screen, SectionTitle, Steps, type StepState } from '../../components/ui';
+import { buttonTriage } from '../../core/triageSchema';
+import type { Situation } from '../../core/types';
+import { config } from '../../services/config';
+import { cachedAdvisories, type Storm } from '../../services/county';
+import { gemmaDeviceReady } from '../../services/gemmaDevice';
+import { runTriage } from '../../services/triage';
+import { transcribe, warmUpWhisper, whisperReady } from '../../services/whisper';
+import { useApp } from '../../state/AppContext';
 
 /** 16 kHz mono 16-bit WAV: what whisper.cpp reads directly. */
 const WAV_16K: RecordingOptions = {
@@ -89,15 +90,13 @@ export default function Home() {
     warmUpWhisper();
   }, []);
 
-  // Refresh status chips whenever Home comes back into view (e.g. after downloading models).
+  // Refresh the readiness prompt whenever Home comes back into view (e.g. after downloading models).
   useFocusEffect(
     useCallback(() => {
       setModels({ voice: whisperReady(), ai: gemmaDeviceReady() });
       cachedAdvisories().then((c) => setStorm(c?.data[0] ?? null));
     }, [online]),
   );
-
-  const zone = profile?.addressCoords ? zoneFor(profile.addressCoords) : null;
 
   const startRecording = async () => {
     setNotice('');
@@ -181,28 +180,19 @@ export default function Home() {
   };
 
   return (
-    <Screen>
+    <Screen hide911>
+      <SosButton />
       <QueuedReports />
 
       {profile?.fullName ? <Text style={s.greeting}>{t('home.greeting', { name: profile.fullName.split(' ')[0] })}</Text> : null}
       <Text style={s.title}>{t('home.title')}</Text>
 
-      <View style={s.chips}>
-        <Chip icon={online ? 'wifi' : 'cloud-offline-outline'} label={online ? t('home.statusOnline') : t('home.statusOffline')} tone={online ? 'green' : 'neutral'} />
-        <Chip
-          icon={models.voice ? 'mic' : 'mic-off-outline'}
-          label={models.voice ? t('home.voiceReady') : t('home.voiceMissing')}
-          tone={models.voice ? 'green' : 'amber'}
-          onPress={models.voice ? undefined : () => router.push('/profile')}
-        />
-        <Chip
-          icon={models.ai ? 'hardware-chip-outline' : 'download-outline'}
-          label={models.ai ? t('home.aiReady') : t('home.aiMissing')}
-          tone={models.ai ? 'green' : 'amber'}
-          onPress={models.ai ? undefined : () => router.push('/profile')}
-        />
-        {zone && zone !== 'N' ? <Chip icon="navigate-outline" label={t('prepare.zoneValue', { zone })} tone="blue" onPress={() => router.push('/prepare')} /> : null}
-      </View>
+      {/* One prompt, only when something needs doing: the app works without internet once these are downloaded. */}
+      {!models.voice || !models.ai ? (
+        <View style={s.chips}>
+          <Chip icon="download-outline" label={t('home.getReady')} tone="amber" onPress={() => router.push('/profile')} />
+        </View>
+      ) : null}
 
       {storm ? (
         <Pressable onPress={() => router.push('/prepare')} style={({ pressed }) => [s.storm, pressed && { opacity: 0.9 }]}>
@@ -220,7 +210,7 @@ export default function Home() {
       {/* Voice */}
       <View style={s.micWrap}>
         <View style={s.micCircleWrap}>
-          <Pulse active={recording} color={colors.red} size={150} />
+          <Pulse active={recording} color={colors.red} size={96} />
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={recording ? t('home.listening') : t('home.tapToTalk')}
@@ -228,11 +218,13 @@ export default function Home() {
             disabled={busy}
             style={({ pressed }) => [s.mic, recording && s.micActive, (busy || pressed) && { opacity: 0.8 }]}
           >
-            <Ionicons name={recording ? 'stop' : 'mic'} size={60} color="#fff" />
+            <Ionicons name={recording ? 'stop' : 'mic'} size={40} color="#fff" />
           </Pressable>
         </View>
-        <Text style={s.micLabel}>{recording ? t('home.listening') : phase === 'transcribing' ? t('home.transcribing') : t('home.tapToTalk')}</Text>
-        {recording ? <Text style={s.timer}>{elapsed}</Text> : null}
+        <View style={{ flex: 1 }}>
+          <Text style={s.micLabel}>{recording ? t('home.listening') : phase === 'transcribing' ? t('home.transcribing') : t('home.tapToTalk')}</Text>
+          {recording ? <Text style={s.timer}>{elapsed}</Text> : null}
+        </View>
       </View>
 
       {phase !== 'idle' ? (
@@ -281,7 +273,7 @@ export default function Home() {
         ) : null}
         <View style={s.inputActions}>
           <Pressable onPress={pickPhoto} style={({ pressed }) => [s.camBtn, pressed && { opacity: 0.8 }]} accessibilityLabel={t('home.addPhoto')}>
-            <Ionicons name="camera-outline" size={24} color={colors.navy} />
+            <Ionicons name="camera" size={24} color={colors.blue} />
           </Pressable>
           <Button
             label={phase === 'thinking' ? t('home.thinking') : t('home.getHelp')}
@@ -333,9 +325,6 @@ export default function Home() {
         ))}
       </View>
 
-      <SectionTitle>{t('home.more')}</SectionTitle>
-      <ListRow icon="shield-checkmark-outline" tone="blue" title={t('home.prepare')} subtitle={t('home.prepareSub')} onPress={() => router.push('/prepare')} />
-      <ListRow icon="person-circle-outline" tone="navy" title={t('home.profile')} subtitle={t('home.profileSub')} onPress={() => router.push('/profile')} />
       <Disclaimer />
     </Screen>
   );
@@ -348,11 +337,11 @@ const s = StyleSheet.create({
   storm: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.navy2, borderRadius: radius.lg, padding: 14, marginTop: 8, ...shadow },
   stormTitle: { color: '#fff', fontSize: font.body, fontWeight: '800' },
   stormSub: { color: '#C7D4EA', fontSize: 13, marginTop: 2 },
-  micWrap: { alignItems: 'center', marginTop: 18, marginBottom: 6 },
-  micCircleWrap: { width: 150, height: 150, alignItems: 'center', justifyContent: 'center' },
-  mic: { width: 132, height: 132, borderRadius: 66, backgroundColor: colors.navy, alignItems: 'center', justifyContent: 'center', ...shadow },
+  micWrap: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 14, marginBottom: 4, paddingVertical: 12, paddingHorizontal: 14, borderRadius: radius.lg, backgroundColor: colors.blueBg, borderWidth: 1, borderColor: '#C9DDF5' },
+  micCircleWrap: { width: 96, height: 96, alignItems: 'center', justifyContent: 'center' },
+  mic: { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.navy, alignItems: 'center', justifyContent: 'center', ...shadow },
   micActive: { backgroundColor: colors.red },
-  micLabel: { fontSize: font.large, fontWeight: '800', color: colors.text, marginTop: 10, textAlign: 'center' },
+  micLabel: { fontSize: font.large, fontWeight: '800', color: colors.navy },
   timer: { fontSize: font.large, color: colors.red, fontWeight: '700', fontVariant: ['tabular-nums'], marginTop: 2 },
   notice: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', backgroundColor: colors.blueBg, borderRadius: radius.md, padding: 12, marginVertical: 6 },
   noticeText: { flex: 1, fontSize: 15, color: colors.text, lineHeight: 21 },
@@ -374,7 +363,7 @@ const s = StyleSheet.create({
   photoText: { fontSize: 14, color: colors.muted },
   photoRemove: { fontSize: 14, color: colors.red, fontWeight: '700', marginTop: 4 },
   inputActions: { flexDirection: 'row', gap: 10, alignItems: 'center', marginTop: 12 },
-  camBtn: { width: 52, height: 52, borderRadius: radius.md, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.card },
+  camBtn: { width: 52, height: 52, borderRadius: radius.md, borderWidth: 1.5, borderColor: colors.blue, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.blueBg },
   demoToggle: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 12, marginBottom: 6 },
   demoToggleText: { fontSize: 14, fontWeight: '700', color: colors.muted },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
