@@ -31,6 +31,7 @@ const en = {
     addContacts: 'Add emergency contacts',
   },
   onboarding: {
+    selectLanguage: 'Select Display Language',
     stepOf: 'Step {{n}} of 3',
     getReady: 'Get ready for no internet',
     getReadyBody: 'After a storm, data often goes down. Set this up now so AidNow keeps working.',

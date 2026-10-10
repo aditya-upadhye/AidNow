@@ -159,6 +159,10 @@ export default function Home() {
     setPhase('thinking');
     const triage = await runTriage({ text, english, photoBase64: online ? photo?.base64 : undefined, lang, online });
     setSession({ text, english, photoBase64: photo?.base64, photoUri: photo?.uri, triage, answers: {} });
+    // Start the next request clean, so an old message or photo can never leak into a new one.
+    setText('');
+    setEnglish('');
+    setPhoto(null);
     setPhase('idle');
     router.push('/result');
   };
@@ -252,7 +256,8 @@ export default function Home() {
           value={text}
           onChangeText={(v) => {
             setText(v);
-            if (!v.trim()) setEnglish('');
+            // The English translation belongs to the transcript as spoken; once the text is edited it is stale.
+            setEnglish('');
           }}
           placeholder={t('home.typePlaceholder')}
           placeholderTextColor={colors.faint}

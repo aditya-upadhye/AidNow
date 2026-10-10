@@ -37,6 +37,7 @@ const ht: Strings = {
     addContacts: 'Ajoute kontak ijans',
   },
   onboarding: {
+    selectLanguage: 'Chwazi lang ou pou aplikasyon an',
     stepOf: 'Etap {{n}} sou 3',
     getReady: 'Prepare pou lè pa gen entènèt',
     getReadyBody: 'Apre yon tanpèt, entènèt la souvan tonbe. Prepare sa kounye a pou AidNow kontinye mache.',

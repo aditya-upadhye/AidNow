@@ -34,6 +34,7 @@ const es: Strings = {
     addContacts: 'Agregar contactos de emergencia',
   },
   onboarding: {
+    selectLanguage: 'Seleccione el idioma de la aplicación',
     stepOf: 'Paso {{n}} de 3',
     getReady: 'Prepárese para estar sin internet',
     getReadyBody: 'Después de una tormenta, los datos suelen fallar. Configure esto ahora para que AidNow siga funcionando.',

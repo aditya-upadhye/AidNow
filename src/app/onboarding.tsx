@@ -93,6 +93,7 @@ export default function Onboarding() {
           <Text style={s.appName}>AidNow</Text>
           <Text style={s.miami}>Miami-Dade</Text>
         </View>
+        <Text style={s.langPrompt}>{t('onboarding.selectLanguage')}</Text>
         {LANGS.map((l) => (
           <Pressable key={l.code} onPress={() => pick(l.code)} style={({ pressed }) => [s.lang, pressed && { opacity: 0.9, transform: [{ scale: 0.99 }] }]}>
             <View style={{ flex: 1 }}>
@@ -196,6 +197,7 @@ const s = StyleSheet.create({
   bigLogo: { width: 96, height: 96, borderRadius: 24 },
   appName: { fontSize: font.huge, fontWeight: '900', color: colors.navy, marginTop: 12, letterSpacing: -0.8 },
   miami: { fontSize: 15, fontWeight: '700', color: colors.muted, marginTop: 2, letterSpacing: 1, textTransform: 'uppercase' },
+  langPrompt: { fontSize: font.title, fontWeight: '800', color: colors.text, textAlign: 'center', marginBottom: 8 },
   lang: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.navy, borderRadius: radius.lg, paddingVertical: 20, paddingHorizontal: 20, marginVertical: 7, ...shadow },
   langText: { color: '#fff', fontSize: 24, fontWeight: '800' },
   langTag: { color: '#C7D4EA', fontSize: 15, marginTop: 3 },

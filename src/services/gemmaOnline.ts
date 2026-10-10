@@ -11,9 +11,9 @@ export async function triageOnline(input: { text: string; english?: string; phot
   if (!config.geminiApiKey) return null;
 
   const userText =
-    `Resident's message (display language ${input.lang}):\n"""${input.text}"""` +
+    `Resident's message (display language ${input.lang}):\n"""${input.text.trim() || '(no text, photo only)'}"""` +
     (input.english && input.english !== input.text ? `\nOn-device English translation:\n"""${input.english}"""` : '') +
-    (input.photoBase64 ? '\nA photo is attached.' : '\nNo photo.');
+    (input.photoBase64 ? '\nA photo is attached. Look at it together with the message.' : '\nNo photo.');
 
   const parts: object[] = [{ text: TRIAGE_SYSTEM_PROMPT + '\n\n' + userText }];
   if (input.photoBase64) parts.push({ inline_data: { mime_type: 'image/jpeg', data: input.photoBase64 } });
